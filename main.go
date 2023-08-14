@@ -46,8 +46,8 @@ func main() {
 	go func() {
 		for {
 			bds.Reqws()
-			fmt.Printf("与bds服务器失去连接 5秒后将尝试重连 ...\n")
-			time.Sleep(5 * time.Second)
+			fmt.Printf("与bds服务器失去连接 10秒后将尝试重连 ...\n")
+			time.Sleep(10 * time.Second)
 		}
 	}()
 	for {
