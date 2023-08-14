@@ -6,7 +6,6 @@ import (
 	"github.com/gucooing/bdstobot/config"
 	"github.com/gucooing/bdstobot/pgk/motd"
 	"io/ioutil"
-	"log"
 	"strconv"
 	"time"
 
@@ -26,12 +25,12 @@ func init() {
 	if err != nil {
 		fmt.Println("无法读取配置文件: %v\n", err)
 	}
-	var config Config
-	err = json.Unmarshal(file, &config)
+	var nweconfig Config
+	err = json.Unmarshal(file, &nweconfig)
 	if err != nil {
 		fmt.Println("配置文件解析错误: %v\n", err)
 	}
-	s, err = discordgo.New("Bot " + config.DiscordBotToken)
+	s, err = discordgo.New("Bot " + nweconfig.DiscordBotToken)
 	if err != nil {
 		fmt.Println("discord bot token 无效: %v", err)
 	}
@@ -74,7 +73,7 @@ var (
 						{
 							Name: "选项参数二",
 							NameLocalizations: map[discordgo.Locale]string{
-								discordgo.ChineseCN: "选项参数er",
+								discordgo.ChineseCN: "选项参数二",
 							},
 							Value: 2,
 						},
@@ -101,7 +100,8 @@ var (
 				},
 			})
 			if err != nil {
-				log.Fatal(err)
+				fmt.Println(err)
+				return
 			}
 		},
 	}
@@ -122,24 +122,28 @@ func DiscordBot() {
 
 	err := s.Open()
 	if err != nil {
-		log.Fatalf("bot无法连接到discord: %v\n", err)
+		fmt.Println("bot无法连接到discord: %v\n", err)
+		return
 	}
 	file, err := ioutil.ReadFile("config.json")
 	if err != nil {
 		fmt.Println("无法读取配置文件: %v\n", err)
+		return
 	}
-	var config Config
-	err = json.Unmarshal(file, &config)
+	var nweconfig Config
+	err = json.Unmarshal(file, &nweconfig)
 	if err != nil {
 		fmt.Println("配置文件解析错误: %v\n", err)
+		return
 	}
 
 	fmt.Println("注册命令中...")
 	registeredCommands := make([]*discordgo.ApplicationCommand, len(commands))
 	for i, v := range commands {
-		cmd, err := s.ApplicationCommandCreate(s.State.User.ID, config.GuildID, v)
+		cmd, err := s.ApplicationCommandCreate(s.State.User.ID, nweconfig.GuildID, v)
 		if err != nil {
-			log.Fatalf("无法注册 '%v' 命令: %v\n", v.Name, err)
+			fmt.Println("无法注册 '%v' 命令: %v\n", v.Name, err)
+			return
 		}
 		registeredCommands[i] = cmd
 	}

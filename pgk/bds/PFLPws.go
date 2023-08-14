@@ -6,6 +6,7 @@ import (
 	"github.com/gorilla/websocket"
 	"github.com/gucooing/bdstobot/config"
 	"github.com/gucooing/bdstobot/pgk"
+	"github.com/gucooing/bdstobot/pgk/qq"
 	"strconv"
 	"time"
 )
@@ -16,7 +17,7 @@ var conn *websocket.Conn = nil
 func Reqws() {
 	// 创建 WebSocket 连接
 	var err error
-	serverURL := config.GetConfig().BdsWsurl
+	serverURL := config.GetConfig().PFLPWsurl
 	conn, _, err = websocket.DefaultDialer.Dial(serverURL, nil)
 	if err != nil {
 		return
@@ -58,20 +59,35 @@ func reswsdata(message string) string {
 	}
 	times := time.Now().Unix()
 	fmt.Printf("ws接收数据: %v\n", message)
+	//未加密数据解析处理
 	if playe.Cause == "join" {
 		msg := "玩家：" + playe.Params.Sender + " 偷偷的加入服务器.(<t:" + strconv.Itoa(int(times)) + ":R>)"
 		fmt.Printf("发送数据: %v\n", msg)
-		pgk.Discord(msg)
+		nreswsdata(msg)
 	}
 	if playe.Cause == "left" {
 		msg := "玩家：" + playe.Params.Sender + " 悄悄地退出服务器.(<t:" + strconv.Itoa(int(times)) + ":R>)"
-		pgk.Discord(msg)
+		nreswsdata(msg)
 	}
 	if playe.Cause == "chat" {
 		msg := "玩家：" + playe.Params.Sender + " 说：" + playe.Params.Text + "(<t:" + strconv.Itoa(int(times)) + ":R>)"
-		pgk.Discord(msg)
+		nreswsdata(msg)
 	}
 	return ""
+}
+
+// 传递逻辑再处理
+func nreswsdata(msg string) {
+	if config.GetConfig().QQ {
+		//发送QQ消息
+		qq.SendWSMessagesi(msg)
+	}
+	if config.GetConfig().DiscordBot {
+		//使用内置discord bot发送消息
+		pgk.Discord(msg)
+	} else {
+		//使用外置discord bot发送消息
+	}
 }
 
 // SendWSMessage 定义发送函数

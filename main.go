@@ -9,6 +9,7 @@ import (
 	"github.com/gucooing/bdstobot/pgk/bds"
 	"github.com/gucooing/bdstobot/pgk/discordbot"
 	"github.com/gucooing/bdstobot/pgk/motd"
+	"github.com/gucooing/bdstobot/pgk/qq"
 	"os"
 	"time"
 )
@@ -36,21 +37,37 @@ func main() {
 			panic(err)
 		}
 	}
-	go func() {
-		for {
-			discordbot.DiscordBot()
-			fmt.Printf("discord bot 失去连接 重连中 ...\n")
-			time.Sleep(5 * time.Second)
-		}
-	}()
-	go func() {
+	//qq部分
+	if config.GetConfig().QQ { //是否启用QQ
+		go func() {
+			for {
+				qq.Reqws()
+				fmt.Printf("cqhttp 失去连接 重连中 ...\n")
+				time.Sleep(5 * time.Second)
+			}
+		}()
+	}
+	//discord bot部分
+	if config.GetConfig().DiscordBot {
+		fmt.Printf("使用内置 discord bot\n")
+		go func() {
+			for {
+				discordbot.DiscordBot()
+				fmt.Printf("discord bot 失去连接 重连中 ...\n")
+				time.Sleep(5 * time.Second)
+			}
+		}()
+	} else {
+		//连接外置discord bot
+	}
+	go func() { //连接PFLP ws
 		for {
 			bds.Reqws()
-			fmt.Printf("与bds服务器失去连接 10秒后将尝试重连 ...\n")
+			fmt.Printf("与bds服务器插件 PFLP 失去连接 10秒后将尝试重连 ...\n")
 			time.Sleep(10 * time.Second)
 		}
 	}()
-	for {
+	for { //死循环保活+服务器状态监控
 		data, err := motd.MotdBE(config.GetConfig().Host)
 		if errorCount == 2 {
 			pgk.Discord("bds服务器掉线 尝试重连")

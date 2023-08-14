@@ -8,11 +8,13 @@ import (
 
 type Config struct {
 	Host              string `json:"Host"`
+	QQ                bool   `json:"QQ"`
 	QqAdmin           int64  `json:"Qqadmin"`
 	QQgroup           int64  `json:"QQgroup"`
 	CqhttpWsurl       string `json:"CqhttpWsurl"`
-	BdsWsurl          string `json:"BdsWsurl"`
+	PFLPWsurl         string `json:"BdsWsurl"`
 	DiscordWebhookUrl string `json:"DiscordWebhookUrl"`
+	DiscordBot        bool   `json:"DiscordBot"`
 	DiscordBotToken   string `json:"DiscordBotToken"`
 	GuildID           string `json:"GuildID"`
 	Key               string `json:"Key"`
@@ -49,11 +51,13 @@ func LoadConfig() error {
 
 var DefaultConfig = &Config{
 	Host:              "127.0.0.1:19132",
+	QQ:                false,
 	QqAdmin:           123456789,
-	QQgroup:           568052501,
+	QQgroup:           123456789,
 	CqhttpWsurl:       "ws://127.0.0.1:80",
-	BdsWsurl:          "http://127.0.0.1",
+	PFLPWsurl:         "ws://127.0.0.1:80",
 	DiscordWebhookUrl: "https://127.0.0.1",
+	DiscordBot:        false,
 	DiscordBotToken:   "1234567890",
 	GuildID:           "",
 	Key:               "1234567890",
