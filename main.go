@@ -39,6 +39,7 @@ func main() {
 	}
 	//qq部分
 	if config.GetConfig().QQ { //是否启用QQ
+		fmt.Printf("开启使用cqhttp连接QQ\n")
 		go func() {
 			for {
 				qq.Reqws()
