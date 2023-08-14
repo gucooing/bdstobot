@@ -85,6 +85,7 @@ jobs:
       with:
         name: gomcbe-linux.zip
         path: |
+          config/config.json
           gomcbe-linux-x64
           gomcbe-linux-x86
           gomcbe-linux-arm
@@ -94,6 +95,7 @@ jobs:
       with:
         name: gomcbe-windows.zip
         path: |
+          config/config.json
           gomcbe-windows-x64.exe
           gomcbe-windows-x86.exe
           gomcbe-windows-arm.exe
