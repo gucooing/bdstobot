@@ -8,13 +8,13 @@ import (
 
 type Config struct {
 	Host              string `json:"Host"`
-	QQ                bool   `json:"QQ"`
+	QQ                bool
 	QqAdmin           int64  `json:"Qqadmin"`
 	QQgroup           int64  `json:"QQgroup"`
 	CqhttpWsurl       string `json:"CqhttpWsurl"`
 	PFLPWsurl         string `json:"BdsWsurl"`
 	DiscordWebhookUrl string `json:"DiscordWebhookUrl"`
-	DiscordBot        bool   `json:"DiscordBot"`
+	DiscordBot        bool
 	DiscordBotToken   string `json:"DiscordBotToken"`
 	GuildID           string `json:"GuildID"`
 	Key               string `json:"Key"`

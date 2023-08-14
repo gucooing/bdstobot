@@ -23,16 +23,16 @@ func init() {
 	var err error
 	file, err := ioutil.ReadFile("config.json")
 	if err != nil {
-		fmt.Println("无法读取配置文件: %v\n", err)
+		fmt.Printf("无法读取配置文件: %v\n", err)
 	}
 	var nweconfig Config
 	err = json.Unmarshal(file, &nweconfig)
 	if err != nil {
-		fmt.Println("配置文件解析错误: %v\n", err)
+		fmt.Printf("配置文件解析错误: %v\n", err)
 	}
 	s, err = discordgo.New("Bot " + nweconfig.DiscordBotToken)
 	if err != nil {
-		fmt.Println("discord bot token 无效: %v", err)
+		fmt.Printf("discord bot token 无效: %v\n", err)
 	}
 }
 
@@ -51,35 +51,37 @@ var (
 			DescriptionLocalizations: &map[discordgo.Locale]string{
 				discordgo.ChineseCN: "使用ping 测试服务器延迟",
 			},
-			Options: []*discordgo.ApplicationCommandOption{
-				{
-					Name:        "选项",
-					Description: "此指令的一级选项",
-					NameLocalizations: map[discordgo.Locale]string{
-						discordgo.ChineseCN: "选项",
-					},
-					DescriptionLocalizations: map[discordgo.Locale]string{
-						discordgo.ChineseCN: "此指令的一级选项",
-					},
-					Type: discordgo.ApplicationCommandOptionInteger,
-					Choices: []*discordgo.ApplicationCommandOptionChoice{
-						{
-							Name: "选项参数一",
-							NameLocalizations: map[discordgo.Locale]string{
-								discordgo.ChineseCN: "选项参数一",
-							},
-							Value: 1,
+			/*
+				Options: []*discordgo.ApplicationCommandOption{
+					{
+						Name:        "选项",
+						Description: "此指令的一级选项",
+						NameLocalizations: map[discordgo.Locale]string{
+							discordgo.ChineseCN: "选项",
 						},
-						{
-							Name: "选项参数二",
-							NameLocalizations: map[discordgo.Locale]string{
-								discordgo.ChineseCN: "选项参数二",
+						DescriptionLocalizations: map[discordgo.Locale]string{
+							discordgo.ChineseCN: "此指令的一级选项",
+						},
+						Type: discordgo.ApplicationCommandOptionInteger,
+						Choices: []*discordgo.ApplicationCommandOptionChoice{
+							{
+								Name: "选项参数一",
+								NameLocalizations: map[discordgo.Locale]string{
+									discordgo.ChineseCN: "选项参数一",
+								},
+								Value: 1,
 							},
-							Value: 2,
+							{
+								Name: "选项参数二",
+								NameLocalizations: map[discordgo.Locale]string{
+									discordgo.ChineseCN: "选项参数二",
+								},
+								Value: 2,
+							},
 						},
 					},
 				},
-			},
+			*/
 		},
 	}
 
@@ -127,13 +129,13 @@ func DiscordBot() {
 	}
 	file, err := ioutil.ReadFile("config.json")
 	if err != nil {
-		fmt.Println("无法读取配置文件: %v\n", err)
+		fmt.Printf("无法读取配置文件: %v\n", err)
 		return
 	}
 	var nweconfig Config
 	err = json.Unmarshal(file, &nweconfig)
 	if err != nil {
-		fmt.Println("配置文件解析错误: %v\n", err)
+		fmt.Printf("配置文件解析错误: %v\n", err)
 		return
 	}
 
@@ -142,7 +144,7 @@ func DiscordBot() {
 	for i, v := range commands {
 		cmd, err := s.ApplicationCommandCreate(s.State.User.ID, nweconfig.GuildID, v)
 		if err != nil {
-			fmt.Println("无法注册 '%v' 命令: %v\n", v.Name, err)
+			fmt.Printf("无法注册 '%v' 命令: %v\n", v.Name, err)
 			return
 		}
 		registeredCommands[i] = cmd
