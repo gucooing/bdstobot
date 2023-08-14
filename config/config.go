@@ -14,6 +14,7 @@ type Config struct {
 	BdsWsurl          string `json:"BdsWsurl"`
 	DiscordWebhookUrl string `json:"DiscordWebhookUrl"`
 	DiscordBotToken   string `json:"DiscordBotToken"`
+	GuildID           string `json:"GuildID"`
 	Key               string `json:"Key"`
 }
 
@@ -54,5 +55,6 @@ var DefaultConfig = &Config{
 	BdsWsurl:          "http://127.0.0.1",
 	DiscordWebhookUrl: "https://127.0.0.1",
 	DiscordBotToken:   "1234567890",
+	GuildID:           "",
 	Key:               "1234567890",
 }
