@@ -60,6 +60,14 @@ func main() {
 		}()
 	} else {
 		//连接外置discord bot
+		fmt.Printf("使用外置 discord bot\n")
+		go func() {
+			for {
+				pgk.Reqws()
+				fmt.Printf("discord bot 失去连接 重连中 ...\n")
+				time.Sleep(5 * time.Second)
+			}
+		}()
 	}
 	go func() { //连接PFLP ws
 		for {
@@ -70,13 +78,14 @@ func main() {
 	}()
 	for { //死循环保活+服务器状态监控
 		data, err := motd.MotdBE(config.GetConfig().Host)
-		if errorCount == 2 {
+		if errorCount == 3 {
 			pgk.Discord("bds服务器掉线 尝试重连")
 			nerrorCount = 1
 		}
 		if err != nil {
 			errorCount++
 			fmt.Println("获取motd状态失败 错误：", err)
+			time.Sleep(3 * time.Second)
 			continue
 		}
 		if nerrorCount == 1 {

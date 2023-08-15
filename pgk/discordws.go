@@ -1,15 +1,23 @@
-package qq
+package pgk
 
 import (
 	"encoding/json"
 	"fmt"
 	"github.com/gorilla/websocket"
 	"github.com/gucooing/bdstobot/config"
+	"github.com/gucooing/bdstobot/pgk/motd"
+	"strconv"
 )
 
 var conn *websocket.Conn = nil
 
-// Reqws 函数用于建立与 cqhttp 的 WebSocket 连接
+// Rsqdata 定义json结构体
+type Rsqdata struct {
+	Type  string `json:"Type"`
+	Cause string `json:"Cause"`
+}
+
+// Reqws 函数用于建立与外置 Discord bot 的 WebSocket 连接
 func Reqws() {
 	// 检查是否已经存在连接
 	if conn != nil {
@@ -18,7 +26,7 @@ func Reqws() {
 
 	// 创建 WebSocket 连接
 	var err error
-	serverURL := config.GetConfig().CqhttpWsurl
+	serverURL := config.GetConfig().DiscordWsurl
 	conn, _, err = websocket.DefaultDialer.Dial(serverURL, nil)
 	if err != nil {
 		return
@@ -27,7 +35,6 @@ func Reqws() {
 		if err := conn.Close(); err != nil {
 		}
 	}()
-
 	for {
 		_, message, err := conn.ReadMessage()
 		if err != nil {
@@ -40,17 +47,21 @@ func Reqws() {
 func reswsdata(message string) string {
 	//fmt.Printf("ws接收数据: %v\n", message)
 	// 解析JSON
-	var data map[string]interface{}
-	err := json.Unmarshal([]byte(message), &data)
+	var rsqdata Rsqdata
+	err := json.Unmarshal([]byte(message), &rsqdata)
 	if err != nil {
 		fmt.Println("解析JSON失败:", err)
 		return ""
+	}
+	if rsqdata.Type == "ping" {
+		data, _ := motd.MotdBE(config.GetConfig().Host)
+		SendWSMessagesil("motd", strconv.Itoa(int(data.Delay)))
 	}
 	return ""
 }
 
 // SendWSMessage 定义发送函数
-func SendWSMessage(msg interface{}) error {
+func WaiSendWSMessagesi(msg interface{}) error {
 	// 检查是否已经存在连接
 	if conn == nil {
 		serverURL := config.GetConfig().CqhttpWsurl
@@ -69,34 +80,15 @@ func SendWSMessage(msg interface{}) error {
 	return nil
 }
 
-// Params 定义发送结构体
-type Params struct {
-	//MessageType string `json:"message_type"`
-	GroupId    int64  `json:"group_id"`
-	Message    string `json:"message"`
-	AutoEscape bool   `json:"auto_escape"`
-}
-
-type Rsqdata struct {
-	Action string  `json:"action"`
-	Params *Params `json:"params"`
-}
-
 // SendWSMessagesi 定义群聊发送函数
-func SendWSMessagesi(msg string) {
-	//fmt.Println(config.GetConfig().QqAdmin)
+func SendWSMessagesil(types, msg string) {
 	rsqdata := Rsqdata{
-		Action: "send_group_msg",
-		Params: &Params{
-			//MessageType: "private",
-			GroupId:    config.GetConfig().QQgroup,
-			Message:    msg,
-			AutoEscape: false,
-		},
+		Type:  types,
+		Cause: msg,
 	}
 	// 发送消息
-	fmt.Printf("发送QQ群聊数据: %v\n", rsqdata)
-	err := SendWSMessage(rsqdata)
+	fmt.Printf("向 Discord bot 发送数据: %v\n", rsqdata)
+	err := WaiSendWSMessagesi(rsqdata)
 	if err != nil {
 		return
 	}

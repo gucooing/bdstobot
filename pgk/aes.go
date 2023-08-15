@@ -4,85 +4,78 @@ import (
 	"bytes"
 	"crypto/aes"
 	"crypto/cipher"
-	"crypto/rand"
-	"errors"
+	"crypto/md5"
+	"encoding/base64"
 	"fmt"
 	"github.com/gucooing/bdstobot/config"
-	"io"
+	jsoniter "github.com/json-iterator/go"
 )
 
-// Encrypt 加密函数
-func Encrypt(plaintext []byte) ([]byte, error) {
-	key := []byte(config.GetConfig().Key)
-	aeskey := key[:16]
-	fmt.Println("aeskey:", aeskey)
-	block, err := aes.NewCipher(aeskey)
-	if err != nil {
-		return nil, err
-	}
+var newkeymd5 []byte
 
-	// PKCS7Padding填充
-	blockSize := block.BlockSize()
-	plaintext = padding(plaintext, block.BlockSize())
-
-	// 初始化向量IV，长度与blockSize相同
-	ciphertext := make([]byte, blockSize+len(plaintext))
-	iv := key[len(key)-16:]
-	fmt.Println("aesiv:", iv)
-	if _, err := io.ReadFull(rand.Reader, iv); err != nil {
-		return nil, err
-	}
-
-	// 执行加密操作
-	mode := cipher.NewCBCEncrypter(block, iv)
-	mode.CryptBlocks(ciphertext[blockSize:], plaintext)
-
-	return ciphertext, nil
+type Param struct {
+	Mode string `json:"mode"`
+	Raw  string `json:"raw"`
 }
 
-// Decrypt 解密函数
-func Decrypt(ciphertext []byte) ([]byte, error) {
-	key := []byte(config.GetConfig().Key)
-	aeskey := key[:16]
-	block, err := aes.NewCipher(aeskey)
-	if err != nil {
-		return nil, err
-	}
-
-	blockSize := block.BlockSize()
-	if len(ciphertext) < blockSize {
-		return nil, errors.New("密文长度错误")
-	}
-
-	iv := key[len(key)-16:]
-	ciphertext = ciphertext[blockSize:]
-
-	// 执行解密操作
-	mode := cipher.NewCBCDecrypter(block, iv)
-	mode.CryptBlocks(ciphertext, ciphertext)
-
-	// PKCS7Padding去除填充
-	plaintext, err := unpadding(ciphertext)
-	if err != nil {
-		return nil, err
-	}
-
-	return plaintext, nil
+type encryptPkt struct {
+	Type   string `json:"type"`
+	Params Param  `json:"params"`
 }
 
-// PKCS7Padding填充
-func padding(src []byte, blockSize int) []byte {
-	padding := blockSize - len(src)%blockSize
+// Encrypt 加密函数入口
+func Encrypt_send(str string) []byte {
+	en, err := AESBase64Encrypt(str)
+	if err != nil {
+		fmt.Println(err)
+	}
+	pkt := encryptPkt{Params: Param{Mode: "aes_cbc_pck7padding", Raw: en}, Type: "encrypted"}
+	jpkt, _ := jsoniter.Marshal(pkt)
+	//fmt.Println(string(jpkt))
+	return jpkt
+
+}
+
+func AESBase64Encrypt(origin_data string) (base64_result string, err error) {
+	keymd5 := md5.Sum([]byte(config.GetConfig().Key))
+	newkeymd5 = []byte(fmt.Sprintf("%X", keymd5))
+	key := newkeymd5[:16]
+	iv := newkeymd5[16:32]
+
+	var block cipher.Block
+	if block, err = aes.NewCipher(key); err != nil {
+		return
+	}
+	encrypt := cipher.NewCBCEncrypter(block, iv)
+	var source = PKCS5Padding([]byte(origin_data), 16)
+	var dst = make([]byte, len(source))
+	encrypt.CryptBlocks(dst, source)
+	base64_result = base64.StdEncoding.EncodeToString(dst)
+	return
+}
+
+func PKCS5Padding(ciphertext []byte, blockSize int) []byte {
+	padding := blockSize - len(ciphertext)%blockSize
 	padtext := bytes.Repeat([]byte{byte(padding)}, padding)
-	return append(src, padtext...)
+	return append(ciphertext, padtext...)
 }
 
-// PKCS7Padding去除填充
-func unpadding(src []byte) ([]byte, error) {
-	length := len(src)
-	unpadding := int(src[length-1])
-	if unpadding > length {
-		return nil, errors.New("PKCS7填充错误")
+func PKCS5UnPadding(data []byte, blocklen int) ([]byte, error) {
+	if blocklen <= 0 {
+		return nil, fmt.Errorf("invalid blocklen %d", blocklen)
 	}
-	return src[:(length - unpadding)], nil
+	if len(data)%blocklen != 0 || len(data) == 0 {
+		return nil, fmt.Errorf("invalid data len %d", len(data))
+	}
+	padlen := int(data[len(data)-1])
+	if padlen > blocklen || padlen == 0 {
+		return nil, fmt.Errorf("invalid padding")
+	}
+	pad := data[len(data)-padlen:]
+	for i := 0; i < padlen; i++ {
+		if pad[i] != byte(padlen) {
+			return nil, fmt.Errorf("invalid padding")
+		}
+	}
+	return data[:len(data)-padlen], nil
 }

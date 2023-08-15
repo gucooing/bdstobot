@@ -12,9 +12,10 @@ type Config struct {
 	QqAdmin           int64  `json:"Qqadmin"`
 	QQgroup           int64  `json:"QQgroup"`
 	CqhttpWsurl       string `json:"CqhttpWsurl"`
-	PFLPWsurl         string `json:"BdsWsurl"`
+	PFLPWsurl         string `json:"PFLPWsurl"`
 	DiscordWebhookUrl string `json:"DiscordWebhookUrl"`
 	DiscordBot        bool
+	DiscordWsurl      string `json:"DiscordWsurl"`
 	DiscordBotToken   string `json:"DiscordBotToken"`
 	GuildID           string `json:"GuildID"`
 	Key               string `json:"Key"`
@@ -58,6 +59,7 @@ var DefaultConfig = &Config{
 	PFLPWsurl:         "ws://127.0.0.1:80",
 	DiscordWebhookUrl: "https://127.0.0.1",
 	DiscordBot:        false,
+	DiscordWsurl:      "ws://127.0.0.1:80",
 	DiscordBotToken:   "1234567890",
 	GuildID:           "",
 	Key:               "1234567890",

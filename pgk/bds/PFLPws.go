@@ -7,14 +7,20 @@ import (
 	"github.com/gucooing/bdstobot/config"
 	"github.com/gucooing/bdstobot/pgk"
 	"github.com/gucooing/bdstobot/pgk/qq"
+	jsoniter "github.com/json-iterator/go"
 	"strconv"
 	"time"
 )
 
-var conn *websocket.Conn = nil
+var conn *websocket.Conn
 
 // Reqws 函数用于建立与 cqhttp 的 WebSocket 连接
 func Reqws() {
+	// 检查是否已经存在连接
+	if conn != nil {
+		return
+	}
+
 	// 创建 WebSocket 连接
 	var err error
 	serverURL := config.GetConfig().PFLPWsurl
@@ -38,19 +44,33 @@ func Reqws() {
 // Playe 定义接收结构体
 type Playe struct {
 	Type   string  `json:"type"`
-	Cause  string  `json:"Cause"`
-	Params *Params `json:"Params"`
+	Cause  string  `json:"cause"`
+	Action string  `json:"action"`
+	Params *Params `json:"params"`
 }
 
 type Params struct {
-	Sender string `json:"Sender"`
-	Xuid   string `json:"Xuid"`
-	Ip     string `json:"Ip"`
-	Text   string `json:"Text"`
+	Sender string `json:"sender"`
+	Xuid   string `json:"xuid"`
+	Ip     string `json:"ip"`
+	Cmd    string `json:"cmd"`
+	Id     string `json:"id"`
+	Text   string `json:"text"`
+}
+
+type Encrypt struct {
+	Type   string         `json:"type"`
+	Params *EncryptParams `json:"params"`
+}
+
+type EncryptParams struct {
+	Mode string `json:"mode"`
+	Raw  string `json:"raw"`
 }
 
 func reswsdata(message string) string {
 	// 解析JSON
+	//fmt.Printf("ws接收数据: %v\n", message)
 	var playe Playe
 	err := json.Unmarshal([]byte(message), &playe)
 	if err != nil {
@@ -58,26 +78,25 @@ func reswsdata(message string) string {
 		return ""
 	}
 	times := time.Now().Unix()
-	fmt.Printf("ws接收数据: %v\n", message)
 	//未加密数据解析处理
 	if playe.Cause == "join" {
 		msg := "玩家：" + playe.Params.Sender + " 偷偷的加入服务器.(<t:" + strconv.Itoa(int(times)) + ":R>)"
 		fmt.Printf("发送数据: %v\n", msg)
-		nreswsdata(msg)
+		Nreswsdata(msg)
 	}
 	if playe.Cause == "left" {
 		msg := "玩家：" + playe.Params.Sender + " 悄悄地退出服务器.(<t:" + strconv.Itoa(int(times)) + ":R>)"
-		nreswsdata(msg)
+		Nreswsdata(msg)
 	}
 	if playe.Cause == "chat" {
 		msg := "玩家：" + playe.Params.Sender + " 说：" + playe.Params.Text + "(<t:" + strconv.Itoa(int(times)) + ":R>)"
-		nreswsdata(msg)
+		Nreswsdata(msg)
 	}
 	return ""
 }
 
 // 传递逻辑再处理
-func nreswsdata(msg string) {
+func Nreswsdata(msg string) {
 	if config.GetConfig().QQ {
 		//发送QQ消息
 		qq.SendWSMessagesi(msg)
@@ -87,18 +106,48 @@ func nreswsdata(msg string) {
 		pgk.Discord(msg)
 	} else {
 		//使用外置discord bot发送消息
+		pgk.SendWSMessagesil("chat", msg)
 	}
 }
 
 // SendWSMessage 定义发送函数
-func SendWSMessage(msg interface{}) error {
-	var err error
-	serverURL := config.GetConfig().CqhttpWsurl
-	conn, _, err = websocket.DefaultDialer.Dial(serverURL, nil)
+func SendWSMessage(msg []byte) error {
+	// 检查是否已经存在连接
+	if conn == nil {
+		serverURL := config.GetConfig().CqhttpWsurl
+		var err error
+		conn, _, err = websocket.DefaultDialer.Dial(serverURL, nil)
+		if err != nil {
+			return err
+		}
+	}
 	// 发送消息
-	err = conn.WriteJSON(msg)
+	err := conn.WriteMessage(websocket.TextMessage, msg)
 	if err != nil {
 		return err
 	}
 	return nil
+}
+
+// SendWSMessagesi 定义发送函数
+func SendWSMessagesi(types, msg string) {
+	if types == "cmd" {
+		//newcmd, _ := pgk.Encrypt([]byte(msg))
+		playe := Playe{
+			Type:   "pack",
+			Action: "runcmdrequest",
+			Params: &Params{
+				Cmd: msg,
+				Id:  "0",
+			},
+		}
+		jpkt, _ := jsoniter.Marshal(playe)
+		newplaye := pgk.Encrypt_send(string(jpkt))
+		// 发送消息
+		fmt.Printf("向 PFLP发送 发送数据: %v\n", string(newplaye))
+		err := SendWSMessage(newplaye)
+		if err != nil {
+			return
+		}
+	}
 }
