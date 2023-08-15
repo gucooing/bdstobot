@@ -7,7 +7,7 @@
   "PFLPWsurl": "ws://127.0.0.1:80",
   "DiscordWebhookUrl": "https://127.0.0.1",
   "DiscordBot": false,
-  "DidcordWsurl": "ws://127.0.0.1:80",
+  "DiscordWsurl": "ws://127.0.0.1:80",
   "DiscordBotToken": "1234567890",
   "GuildID": "",
   "key":"1234567890"
