@@ -16,6 +16,7 @@ import (
 type Config struct {
 	GuildID         string `json:"GuildID"`
 	DiscordBotToken string `json:"DiscordBotToken"`
+	RemoveCommands  bool   `json:"RemoveCommands"`
 }
 
 var s *discordgo.Session
@@ -69,6 +70,18 @@ var (
 					Description: "你游戏里面的昵称",
 					Required:    true,
 				},
+			},
+		},
+		{
+			Name:        "解绑",
+			Description: "使用“解绑”指令删除服务器白名单",
+			NameLocalizations: &map[discordgo.Locale]string{
+				discordgo.ChineseCN: "解绑",
+			},
+			DescriptionLocalizations: &map[discordgo.Locale]string{
+				discordgo.ChineseCN: "使用“解绑”指令删除服务器白名单",
+			},
+			Options: []*discordgo.ApplicationCommandOption{
 				{
 					Type:        discordgo.ApplicationCommandOptionString,
 					Name:        "解绑",
@@ -120,6 +133,34 @@ var (
 				bds.SendWSMessagesi("cmd", margss)
 				msgformat += "> 用户: %s\n> 游戏昵称: %s\n"
 			}
+
+			err := s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+				Type: discordgo.InteractionResponseChannelMessageWithSource,
+				Data: &discordgo.InteractionResponseData{
+					Content: fmt.Sprintf(
+						msgformat,
+						margs...,
+					),
+				},
+			})
+			if err != nil {
+				fmt.Println(err)
+				return
+			}
+		},
+		"解绑": func(s *discordgo.Session, i *discordgo.InteractionCreate) {
+			options := i.ApplicationCommandData().Options
+			optionMap := make(map[string]*discordgo.ApplicationCommandInteractionDataOption, len(options))
+			for _, opt := range options {
+				optionMap[opt.Name] = opt
+			}
+
+			margs := make([]interface{}, 0, len(options))
+			msgformat := "操作成功:\n"
+
+			user := i.Interaction.Member.User
+			username := user.Username
+
 			if option, ok := optionMap["解绑"]; ok {
 				margs = append(margs, username, option.StringValue())
 				//建议在此进行逻辑处理

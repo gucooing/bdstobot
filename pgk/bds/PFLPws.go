@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"github.com/gorilla/websocket"
 	"github.com/gucooing/bdstobot/config"
-	"github.com/gucooing/bdstobot/pgk"
+	"github.com/gucooing/bdstobot/pgk/discord"
 	"github.com/gucooing/bdstobot/pgk/qq"
 	jsoniter "github.com/json-iterator/go"
 	"strconv"
@@ -103,10 +103,10 @@ func Nreswsdata(msg string) {
 	}
 	if config.GetConfig().DiscordBot {
 		//使用内置discord bot发送消息
-		pgk.Discord(msg)
+		discord.Discord(msg)
 	} else {
 		//使用外置discord bot发送消息
-		pgk.SendWSMessagesil("chat", msg)
+		discord.SendWSMessagesil("chat", msg)
 	}
 }
 
@@ -142,7 +142,7 @@ func SendWSMessagesi(types, msg string) {
 			},
 		}
 		jpkt, _ := jsoniter.Marshal(playe)
-		newplaye := pgk.Encrypt_send(string(jpkt))
+		newplaye := discord.Encrypt_send(string(jpkt))
 		// 发送消息
 		fmt.Printf("向 PFLP发送 发送数据: %v\n", string(newplaye))
 		err := SendWSMessage(newplaye)

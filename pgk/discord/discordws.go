@@ -1,4 +1,4 @@
-package pgk
+package discord
 
 import (
 	"encoding/json"

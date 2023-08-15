@@ -5,8 +5,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/gucooing/bdstobot/config"
-	"github.com/gucooing/bdstobot/pgk"
 	"github.com/gucooing/bdstobot/pgk/bds"
+	"github.com/gucooing/bdstobot/pgk/discord"
 	"github.com/gucooing/bdstobot/pgk/discordbot"
 	"github.com/gucooing/bdstobot/pgk/motd"
 	"github.com/gucooing/bdstobot/pgk/qq"
@@ -63,7 +63,7 @@ func main() {
 		fmt.Printf("使用外置 discord bot\n")
 		go func() {
 			for {
-				pgk.Reqws()
+				discord.Reqws()
 				fmt.Printf("discord bot 失去连接 重连中 ...\n")
 				time.Sleep(5 * time.Second)
 			}
@@ -79,7 +79,7 @@ func main() {
 	for { //死循环保活+服务器状态监控
 		data, err := motd.MotdBE(config.GetConfig().Host)
 		if errorCount == 3 {
-			pgk.Discord("bds服务器掉线 尝试重连")
+			discord.Discord("bds服务器掉线 尝试重连")
 			nerrorCount = 1
 		}
 		if err != nil {
@@ -89,7 +89,7 @@ func main() {
 			continue
 		}
 		if nerrorCount == 1 {
-			pgk.Discord("bds服务器重连成功")
+			discord.Discord("bds服务器重连成功")
 		}
 		fmt.Println(data)
 		errorCount = 0
