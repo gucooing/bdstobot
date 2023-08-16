@@ -1,20 +1,26 @@
 package discord
 
 import (
+	"encoding/base64"
 	"encoding/json"
 	"fmt"
+	"github.com/golang/protobuf/proto"
 	"github.com/gorilla/websocket"
 	"github.com/gucooing/bdstobot/config"
-	"github.com/gucooing/bdstobot/pgk/motd"
-	"strconv"
+	"github.com/gucooing/bdstobot/pgk/decrypt"
+	proto2 "github.com/gucooing/bdstobot/pgk/proto"
+	"github.com/gucooing/bdstobot/pgk/takeover"
 )
 
-var conn *websocket.Conn = nil
+var (
+	conn *websocket.Conn = nil
+)
 
 // Rsqdata 定义json结构体
 type Rsqdata struct {
 	Type  string `json:"Type"`
 	Cause string `json:"Cause"`
+	User  string `json:"User"`
 }
 
 // Reqws 函数用于建立与外置 Discord bot 的 WebSocket 连接
@@ -40,22 +46,40 @@ func Reqws() {
 		if err != nil {
 			return
 		}
-		_ = reswsdata(string(message))
+		_ = biswsdata(message)
 	}
 }
 
-func reswsdata(message string) string {
+// 定义加密数据结构体
+type Rsab struct {
+	Content string `json:"content"`
+	Sign    string `json:"sign"`
+}
+
+func biswsdata(message []byte) string {
 	//fmt.Printf("ws接收数据: %v\n", message)
 	// 解析JSON
-	var rsqdata Rsqdata
-	err := json.Unmarshal([]byte(message), &rsqdata)
+	var rsab Rsab
+	fmt.Println(message)
+	err := json.Unmarshal(message, &rsab)
 	if err != nil {
 		fmt.Println("解析JSON失败:", err)
 		return ""
 	}
-	if rsqdata.Type == "ping" {
-		data, _ := motd.MotdBE(config.GetConfig().Host)
-		SendWSMessagesil("motd", strconv.Itoa(int(data.Delay)))
+
+	data := decrypt.Protoxor(rsab.Content, rsab.Sign)
+	newdata, _ := base64.StdEncoding.DecodeString(data)
+	// 使用proto.Unmarshal函数将字节切片反序列化为Person对象
+	newPerson := &proto2.Discordbot{}
+	err = proto.Unmarshal(newdata, newPerson)
+	if err != nil {
+		fmt.Println("反序列化失败:", err)
+		return "反序列化失败"
+	}
+
+	if newPerson.Type == "cmd" {
+		fmt.Println("discord用户名：", newPerson.User)
+		takeover.SendWSMessagesi(newPerson.Type, newPerson.Cause)
 	}
 	return ""
 }

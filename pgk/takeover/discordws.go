@@ -1,17 +1,14 @@
-package bds
+package takeover
 
 import (
-	"encoding/json"
 	"fmt"
 	"github.com/gorilla/websocket"
 	"github.com/gucooing/bdstobot/config"
-	"github.com/gucooing/bdstobot/pgk/discord"
 	"github.com/gucooing/bdstobot/pgk/encryption"
-	"github.com/gucooing/bdstobot/pgk/qq"
 	jsoniter "github.com/json-iterator/go"
-	"strconv"
-	"time"
 )
+
+//神b智障方法，临时解决方案
 
 var conn *websocket.Conn
 
@@ -33,13 +30,6 @@ func Reqws() {
 		if err := conn.Close(); err != nil {
 		}
 	}()
-	for {
-		_, message, err := conn.ReadMessage()
-		if err != nil {
-			return
-		}
-		_ = reswsdata(string(message))
-	}
 }
 
 // Playe 定义接收结构体
@@ -67,48 +57,6 @@ type Encrypt struct {
 type EncryptParams struct {
 	Mode string `json:"mode"`
 	Raw  string `json:"raw"`
-}
-
-func reswsdata(message string) string {
-	// 解析JSON
-	//fmt.Printf("ws接收数据: %v\n", message)
-	var playe Playe
-	err := json.Unmarshal([]byte(message), &playe)
-	if err != nil {
-		fmt.Println("解析 JSON 出错:", err)
-		return ""
-	}
-	times := time.Now().Unix()
-	//未加密数据解析处理
-	if playe.Cause == "join" {
-		msg := "玩家：" + playe.Params.Sender + " 偷偷的加入服务器.(<t:" + strconv.Itoa(int(times)) + ":R>)"
-		fmt.Printf("发送数据: %v\n", msg)
-		Nreswsdata(msg)
-	}
-	if playe.Cause == "left" {
-		msg := "玩家：" + playe.Params.Sender + " 悄悄地退出服务器.(<t:" + strconv.Itoa(int(times)) + ":R>)"
-		Nreswsdata(msg)
-	}
-	if playe.Cause == "chat" {
-		msg := "玩家：" + playe.Params.Sender + " 说：" + playe.Params.Text + "(<t:" + strconv.Itoa(int(times)) + ":R>)"
-		Nreswsdata(msg)
-	}
-	return ""
-}
-
-// 传递逻辑再处理
-func Nreswsdata(msg string) {
-	if config.GetConfig().QQ {
-		//发送QQ消息
-		qq.SendWSMessagesi(msg)
-	}
-	if config.GetConfig().DiscordBot {
-		//使用内置discord bot发送消息
-		discord.Discord(msg)
-	} else {
-		//使用外置discord bot发送消息
-		discord.SendWSMessagesil("chat", msg)
-	}
 }
 
 // SendWSMessage 定义发送函数
