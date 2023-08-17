@@ -4,8 +4,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/gucooing/bdstobot/config"
-	"github.com/gucooing/bdstobot/pgk/bds"
 	"github.com/gucooing/bdstobot/pgk/motd"
+	"github.com/gucooing/bdstobot/pgk/takeover"
 	"io/ioutil"
 	"strconv"
 	"time"
@@ -130,7 +130,7 @@ var (
 				margs = append(margs, username, option.StringValue())
 				//建议在此进行逻辑处理
 				margss := "whitelist add " + option.StringValue()
-				bds.SendWSMessagesi("cmd", margss)
+				takeover.Pflpwsreq("cmd", margss)
 				msgformat += "> 用户: %s\n> 游戏昵称: %s\n"
 			}
 
@@ -165,7 +165,7 @@ var (
 				margs = append(margs, username, option.StringValue())
 				//建议在此进行逻辑处理
 				margss := "whitelist remove " + option.StringValue()
-				bds.SendWSMessagesi("cmd", margss)
+				takeover.Pflpwsreq("cmd", margss)
 				msgformat += "> 用户: %s\n> 游戏昵称: %s\n"
 			}
 

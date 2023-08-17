@@ -10,27 +10,7 @@ import (
 
 //神b智障方法，临时解决方案
 
-var conn *websocket.Conn
-
-// Reqws 函数用于建立与 cqhttp 的 WebSocket 连接
-func Reqws() {
-	// 检查是否已经存在连接
-	if conn != nil {
-		return
-	}
-
-	// 创建 WebSocket 连接
-	var err error
-	serverURL := config.GetConfig().PFLPWsurl
-	conn, _, err = websocket.DefaultDialer.Dial(serverURL, nil)
-	if err != nil {
-		return
-	}
-	defer func() {
-		if err := conn.Close(); err != nil {
-		}
-	}()
-}
+var conndiscordbot *websocket.Conn
 
 // Playe 定义接收结构体
 type Playe struct {
@@ -60,18 +40,18 @@ type EncryptParams struct {
 }
 
 // SendWSMessage 定义发送函数
-func SendWSMessage(msg []byte) error {
+func sendWSMessages(msg []byte) error {
 	// 检查是否已经存在连接
-	if conn == nil {
-		serverURL := config.GetConfig().CqhttpWsurl
+	if conndiscordbot == nil {
+		serverURL := config.GetConfig().DiscordWsurl
 		var err error
-		conn, _, err = websocket.DefaultDialer.Dial(serverURL, nil)
+		conndiscordbot, _, err = websocket.DefaultDialer.Dial(serverURL, nil)
 		if err != nil {
 			return err
 		}
 	}
 	// 发送消息
-	err := conn.WriteMessage(websocket.TextMessage, msg)
+	err := conndiscordbot.WriteMessage(websocket.TextMessage, msg)
 	if err != nil {
 		return err
 	}
@@ -79,7 +59,7 @@ func SendWSMessage(msg []byte) error {
 }
 
 // SendWSMessagesi 定义发送函数
-func SendWSMessagesi(types, msg string) {
+func Discordbotwsreq(types, msg string) {
 	if types == "cmd" {
 		//newcmd, _ := pgk.Encrypt([]byte(msg))
 		playe := Playe{
@@ -94,7 +74,7 @@ func SendWSMessagesi(types, msg string) {
 		newplaye := encryption.Encrypt_send(string(jpkt))
 		// 发送消息
 		fmt.Printf("向 PFLP发送 发送数据: %v\n", string(newplaye))
-		err := SendWSMessage(newplaye)
+		err := sendWSMessages(newplaye)
 		if err != nil {
 			return
 		}

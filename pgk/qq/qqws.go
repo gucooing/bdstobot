@@ -5,99 +5,103 @@ import (
 	"fmt"
 	"github.com/gorilla/websocket"
 	"github.com/gucooing/bdstobot/config"
+	"github.com/gucooing/bdstobot/pgk/db"
+	"github.com/gucooing/bdstobot/pgk/takeover"
+	"regexp"
 )
 
-var conn *websocket.Conn = nil
+var connqq *websocket.Conn = nil
+
+type Cqhttppost struct {
+	UserId  int64  `json:"user_id"`
+	GroupId int64  `json:"group_id"`
+	Message string `json:"message"`
+	Sender  *sender
+}
+
+type sender struct {
+	Card     string `json:"card"`
+	Nickname string `json:"nickname"`
+}
 
 // Reqws 函数用于建立与 cqhttp 的 WebSocket 连接
 func Reqws() {
-	// 检查是否已经存在连接
-	if conn != nil {
-		return
-	}
-
 	// 创建 WebSocket 连接
 	var err error
 	serverURL := config.GetConfig().CqhttpWsurl
-	conn, _, err = websocket.DefaultDialer.Dial(serverURL, nil)
+	connqq, _, err = websocket.DefaultDialer.Dial(serverURL, nil)
 	if err != nil {
 		return
 	}
 	defer func() {
-		if err := conn.Close(); err != nil {
+		if err := connqq.Close(); err != nil {
+			return
 		}
 	}()
-
+	fmt.Println("cqhttp ws 连接成功")
 	for {
-		_, message, err := conn.ReadMessage()
+		_, message, err := connqq.ReadMessage()
 		if err != nil {
 			return
 		}
-		_ = reswsdata(string(message))
+		_ = reswsdata(message)
 	}
 }
 
-func reswsdata(message string) string {
-	//fmt.Printf("ws接收数据: %v\n", message)
+func reswsdata(message []byte) string {
 	// 解析JSON
-	var data map[string]interface{}
-	err := json.Unmarshal([]byte(message), &data)
+	var cqhttppost Cqhttppost
+	err := json.Unmarshal(message, &cqhttppost)
 	if err != nil {
 		fmt.Println("解析JSON失败:", err)
 		return ""
 	}
-	return ""
-}
-
-// SendWSMessage 定义发送函数
-func SendWSMessage(msg interface{}) error {
-	// 检查是否已经存在连接
-	if conn == nil {
-		serverURL := config.GetConfig().CqhttpWsurl
-		var err error
-		conn, _, err = websocket.DefaultDialer.Dial(serverURL, nil)
-		if err != nil {
-			return err
+	re := regexp.MustCompile(`^绑定\s+(.*)$`)
+	matches := re.FindStringSubmatch(cqhttppost.Message)
+	if len(matches) > 1 {
+		if cqhttppost.GroupId == config.GetConfig().QQgroup {
+			fmt.Println("绑定的游戏昵称为：", matches[1])
+			namedata := db.FindGameNameByQQ(cqhttppost.UserId)
+			if namedata != "" {
+				takeover.Wscqhttpreq("您已绑定")
+				return "用户已绑定"
+			} else {
+				if db.SaveGameInfo(cqhttppost.UserId, matches[1]) {
+					takeover.Wscqhttpreq("绑定白名单成功！")
+					margss := "whitelist add " + matches[1]
+					takeover.Pflpwsreq("cmd", margss)
+					return ""
+				} else {
+					takeover.Wscqhttpreq("绑定白名单失败，错误出现在意外的地方，请联系管理员确认")
+					return ""
+				}
+			}
 		}
 	}
-
-	// 发送消息
-	err := conn.WriteJSON(msg)
-	if err != nil {
-		return err
+	if cqhttppost.Message == "解绑" {
+		if cqhttppost.GroupId == config.GetConfig().QQgroup {
+			namedata := db.FindGameNameByQQ(cqhttppost.UserId)
+			if namedata != "" {
+				fmt.Println("解绑的游戏昵称为：", namedata)
+				if db.DeleteGameInfoByQQ(cqhttppost.UserId) {
+					takeover.Wscqhttpreq("解绑成功！")
+					margss := "whitelist remove " + namedata
+					takeover.Pflpwsreq("cmd", margss)
+					return ""
+				}
+			} else {
+				takeover.Wscqhttpreq("您没有绑定")
+				return ""
+			}
+		}
 	}
-	return nil
-}
-
-// Params 定义发送结构体
-type Params struct {
-	//MessageType string `json:"message_type"`
-	GroupId    int64  `json:"group_id"`
-	Message    string `json:"message"`
-	AutoEscape bool   `json:"auto_escape"`
-}
-
-type Rsqdata struct {
-	Action string  `json:"action"`
-	Params *Params `json:"params"`
-}
-
-// SendWSMessagesi 定义群聊发送函数
-func SendWSMessagesi(msg string) {
-	//fmt.Println(config.GetConfig().QqAdmin)
-	rsqdata := Rsqdata{
-		Action: "send_group_msg",
-		Params: &Params{
-			//MessageType: "private",
-			GroupId:    config.GetConfig().QQgroup,
-			Message:    msg,
-			AutoEscape: false,
-		},
+	res := regexp.MustCompile(`chat([^/]+)$`)
+	match := res.FindStringSubmatch(cqhttppost.Message)
+	if len(match) > 1 {
+		result := match[1]
+		fmt.Println(result)
+		chat := "[" + cqhttppost.Sender.Nickname + "]QQ群聊消息：" + match[1]
+		takeover.Pflpwsreq("chat", chat)
 	}
-	// 发送消息
-	fmt.Printf("发送QQ群聊数据: %v\n", rsqdata)
-	err := SendWSMessage(rsqdata)
-	if err != nil {
-		return
-	}
+	return "123"
 }

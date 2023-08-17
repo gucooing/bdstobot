@@ -6,35 +6,29 @@ import (
 	"github.com/gorilla/websocket"
 	"github.com/gucooing/bdstobot/config"
 	"github.com/gucooing/bdstobot/pgk/discord"
-	"github.com/gucooing/bdstobot/pgk/encryption"
-	"github.com/gucooing/bdstobot/pgk/qq"
-	jsoniter "github.com/json-iterator/go"
+	"github.com/gucooing/bdstobot/pgk/takeover"
 	"strconv"
 	"time"
 )
 
-var conn *websocket.Conn
+var connpflp *websocket.Conn
 
 // Reqws 函数用于建立与 cqhttp 的 WebSocket 连接
 func Reqws() {
-	// 检查是否已经存在连接
-	if conn != nil {
-		return
-	}
-
 	// 创建 WebSocket 连接
 	var err error
 	serverURL := config.GetConfig().PFLPWsurl
-	conn, _, err = websocket.DefaultDialer.Dial(serverURL, nil)
+	connpflp, _, err = websocket.DefaultDialer.Dial(serverURL, nil)
 	if err != nil {
 		return
 	}
 	defer func() {
-		if err := conn.Close(); err != nil {
+		if err := connpflp.Close(); err != nil {
 		}
 	}()
+	fmt.Println("PFLP ws 连接成功")
 	for {
-		_, message, err := conn.ReadMessage()
+		_, message, err := connpflp.ReadMessage()
 		if err != nil {
 			return
 		}
@@ -100,55 +94,14 @@ func reswsdata(message string) string {
 func Nreswsdata(msg string) {
 	if config.GetConfig().QQ {
 		//发送QQ消息
-		qq.SendWSMessagesi(msg)
+		takeover.Wscqhttpreq(msg)
 	}
+	//发送discord webhook消息
+	discord.Discordwebhook(msg)
 	if config.GetConfig().DiscordBot {
 		//使用内置discord bot发送消息
-		discord.Discord(msg)
 	} else {
 		//使用外置discord bot发送消息
-		discord.SendWSMessagesil("chat", msg)
-	}
-}
-
-// SendWSMessage 定义发送函数
-func SendWSMessage(msg []byte) error {
-	// 检查是否已经存在连接
-	if conn == nil {
-		serverURL := config.GetConfig().CqhttpWsurl
-		var err error
-		conn, _, err = websocket.DefaultDialer.Dial(serverURL, nil)
-		if err != nil {
-			return err
-		}
-	}
-	// 发送消息
-	err := conn.WriteMessage(websocket.TextMessage, msg)
-	if err != nil {
-		return err
-	}
-	return nil
-}
-
-// SendWSMessagesi 定义发送函数
-func SendWSMessagesi(types, msg string) {
-	if types == "cmd" {
-		//newcmd, _ := pgk.Encrypt([]byte(msg))
-		playe := Playe{
-			Type:   "pack",
-			Action: "runcmdrequest",
-			Params: &Params{
-				Cmd: msg,
-				Id:  "0",
-			},
-		}
-		jpkt, _ := jsoniter.Marshal(playe)
-		newplaye := encryption.Encrypt_send(string(jpkt))
-		// 发送消息
-		fmt.Printf("向 PFLP发送 发送数据: %v\n", string(newplaye))
-		err := SendWSMessage(newplaye)
-		if err != nil {
-			return
-		}
+		takeover.Discordbotwsreq("chat", msg)
 	}
 }

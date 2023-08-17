@@ -13,36 +13,25 @@ import (
 )
 
 var (
-	conn *websocket.Conn = nil
+	conndiscordbot *websocket.Conn = nil
 )
-
-// Rsqdata 定义json结构体
-type Rsqdata struct {
-	Type  string `json:"Type"`
-	Cause string `json:"Cause"`
-	User  string `json:"User"`
-}
 
 // Reqws 函数用于建立与外置 Discord bot 的 WebSocket 连接
 func Reqws() {
-	// 检查是否已经存在连接
-	if conn != nil {
-		return
-	}
-
 	// 创建 WebSocket 连接
 	var err error
 	serverURL := config.GetConfig().DiscordWsurl
-	conn, _, err = websocket.DefaultDialer.Dial(serverURL, nil)
+	conndiscordbot, _, err = websocket.DefaultDialer.Dial(serverURL, nil)
 	if err != nil {
 		return
 	}
 	defer func() {
-		if err := conn.Close(); err != nil {
+		if err := conndiscordbot.Close(); err != nil {
 		}
 	}()
+	fmt.Println("外置 discord bot ws 连接成功")
 	for {
-		_, message, err := conn.ReadMessage()
+		_, message, err := conndiscordbot.ReadMessage()
 		if err != nil {
 			return
 		}
@@ -79,41 +68,7 @@ func biswsdata(message []byte) string {
 
 	if newPerson.Type == "cmd" {
 		fmt.Println("discord用户名：", newPerson.User)
-		takeover.SendWSMessagesi(newPerson.Type, newPerson.Cause)
+		takeover.Pflpwsreq(newPerson.Type, newPerson.Cause)
 	}
 	return ""
-}
-
-// SendWSMessage 定义发送函数
-func WaiSendWSMessagesi(msg interface{}) error {
-	// 检查是否已经存在连接
-	if conn == nil {
-		serverURL := config.GetConfig().CqhttpWsurl
-		var err error
-		conn, _, err = websocket.DefaultDialer.Dial(serverURL, nil)
-		if err != nil {
-			return err
-		}
-	}
-
-	// 发送消息
-	err := conn.WriteJSON(msg)
-	if err != nil {
-		return err
-	}
-	return nil
-}
-
-// SendWSMessagesi 定义群聊发送函数
-func SendWSMessagesil(types, msg string) {
-	rsqdata := Rsqdata{
-		Type:  types,
-		Cause: msg,
-	}
-	// 发送消息
-	fmt.Printf("向 Discord bot 发送数据: %v\n", rsqdata)
-	err := WaiSendWSMessagesi(rsqdata)
-	if err != nil {
-		return
-	}
 }
