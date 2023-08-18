@@ -10,5 +10,6 @@
   "DiscordWsurl": "ws://127.0.0.1:80",
   "DiscordBotToken": "1234567890",
   "GuildID": "",
-  "key":"1234567890"
+  "key":"1234567890",
+  "Mcpath": "D:\\bedrock_server.exe"
 }

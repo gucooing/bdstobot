@@ -19,6 +19,7 @@ type Config struct {
 	DiscordBotToken   string `json:"DiscordBotToken"`
 	GuildID           string `json:"GuildID"`
 	Key               string `json:"Key"`
+	Mcpath            string `json:"mcpath"`
 }
 
 var CONF *Config = nil
@@ -63,4 +64,5 @@ var DefaultConfig = &Config{
 	DiscordBotToken:   "1234567890",
 	GuildID:           "",
 	Key:               "1234567890",
+	Mcpath:            "D:\\bedrock_server.exe",
 }

@@ -19,14 +19,14 @@ func Protoxor(content, sign string) string {
 	newcontent, _ := base64.StdEncoding.DecodeString(content)
 	newsign, _ := base64.StdEncoding.DecodeString(sign)
 	rsadata := Rsaen(newcontent, newsign)
-	fmt.Println("rsa解密结果:", rsadata)
+	//fmt.Println("rsa解密结果:", rsadata)
 	// 读取 EC2B 客户端首包密钥
 	var err error
 	ec2b, err = os.ReadFile("data/ec2b.bin")
 	if err != nil {
 		return "读取ec2b错误"
 	}
-	fmt.Println("使用的ec2b是：", base64.StdEncoding.EncodeToString(ec2b))
+	//fmt.Println("使用的ec2b是：", base64.StdEncoding.EncodeToString(ec2b))
 	//对序列化结果的异或
 	newrsadata, _ := base64.StdEncoding.DecodeString(rsadata)
 	Xorec2b(newrsadata)

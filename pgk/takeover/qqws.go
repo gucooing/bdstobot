@@ -1,6 +1,7 @@
 package takeover
 
 import (
+	"encoding/json"
 	"fmt"
 	"github.com/gorilla/websocket"
 	"github.com/gucooing/bdstobot/config"
@@ -52,7 +53,8 @@ func Wscqhttpreq(msg string) {
 		},
 	}
 	// 发送消息
-	fmt.Printf("发送QQ群聊数据: %v\n", rsqdata)
+	reqdatajson, _ := json.Marshal(rsqdata)
+	fmt.Printf("发送QQ群聊数据: %v\n", string(reqdatajson))
 	err := wscqhttpws(rsqdata)
 	if err != nil {
 		return

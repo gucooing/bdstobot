@@ -8,8 +8,6 @@ import (
 	jsoniter "github.com/json-iterator/go"
 )
 
-//神b智障方法，临时解决方案
-
 var conndiscordbot *websocket.Conn
 
 // Playe 定义接收结构体

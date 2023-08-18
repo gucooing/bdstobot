@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/gorilla/websocket"
 	"github.com/gucooing/bdstobot/config"
+	"github.com/gucooing/bdstobot/pgk/danger"
 	"github.com/gucooing/bdstobot/pgk/db"
 	"github.com/gucooing/bdstobot/pgk/takeover"
 	"regexp"
@@ -56,6 +57,14 @@ func reswsdata(message []byte) string {
 		fmt.Println("解析JSON失败:", err)
 		return ""
 	}
+
+	if cqhttppost.Message == "mc 启动!" {
+		back := danger.Cmdstart("chcp 936 & start " + config.GetConfig().Mcpath)
+		takeover.Wscqhttpreq(back)
+		return ""
+	}
+
+	//
 	re := regexp.MustCompile(`^绑定\s+(.*)$`)
 	matches := re.FindStringSubmatch(cqhttppost.Message)
 	if len(matches) > 1 {
@@ -78,6 +87,8 @@ func reswsdata(message []byte) string {
 			}
 		}
 	}
+
+	//
 	if cqhttppost.Message == "解绑" {
 		if cqhttppost.GroupId == config.GetConfig().QQgroup {
 			namedata := db.FindGameNameByQQ(cqhttppost.UserId)
@@ -95,6 +106,8 @@ func reswsdata(message []byte) string {
 			}
 		}
 	}
+
+	//
 	res := regexp.MustCompile(`chat([^/]+)$`)
 	match := res.FindStringSubmatch(cqhttppost.Message)
 	if len(match) > 1 {
@@ -103,5 +116,6 @@ func reswsdata(message []byte) string {
 		chat := "[" + cqhttppost.Sender.Nickname + "]QQ群聊消息：" + match[1]
 		takeover.Pflpwsreq("chat", chat)
 	}
-	return "123"
+
+	return ""
 }

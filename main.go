@@ -79,7 +79,7 @@ func main() {
 	for { //死循环保活+服务器状态监控
 		_, err := motd.MotdBE(config.GetConfig().Host)
 		if errorCount == 3 {
-			discord.Discordwebhook("bds服务器掉线 尝试重连")
+			bds.Nreswsdata("bds服务器掉线 尝试重连")
 			nerrorCount = 1
 		}
 		if err != nil {
@@ -89,7 +89,7 @@ func main() {
 			continue
 		}
 		if nerrorCount == 1 {
-			discord.Discordwebhook("bds服务器重连成功")
+			bds.Nreswsdata("bds服务器重连成功")
 		}
 		//fmt.Println(data)
 		errorCount = 0

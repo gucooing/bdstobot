@@ -76,7 +76,6 @@ func reswsdata(message string) string {
 	//未加密数据解析处理
 	if playe.Cause == "join" {
 		msg := "玩家：" + playe.Params.Sender + " 偷偷的加入服务器.(<t:" + strconv.Itoa(int(times)) + ":R>)"
-		fmt.Printf("发送数据: %v\n", msg)
 		Nreswsdata(msg)
 	}
 	if playe.Cause == "left" {
@@ -98,10 +97,11 @@ func Nreswsdata(msg string) {
 	}
 	//发送discord webhook消息
 	discord.Discordwebhook(msg)
+	//discord bot 主动发送消息 暂时无效
 	if config.GetConfig().DiscordBot {
 		//使用内置discord bot发送消息
 	} else {
 		//使用外置discord bot发送消息
-		takeover.Discordbotwsreq("chat", msg)
+		//takeover.Discordbotwsreq("chat", msg)
 	}
 }
