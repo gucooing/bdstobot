@@ -1,5 +1,6 @@
 package main
 
+/*
 import (
 	"time"
 
@@ -31,8 +32,7 @@ func Discordrich() {
 		Buttons: []*client.Button{
 			&client.Button{
 				Label: "Genshin lmpact Official",
-				//Url:   "https://github.com/gucooing/bdstobot",
-				Url: "https://genshin.hoyoverse.com/",
+				Url:   "https://github.com/gucooing/bdstobot",
 			},
 		},
 	})
@@ -45,3 +45,4 @@ func Discordrich() {
 		time.Sleep(time.Second * 10)
 	}
 }
+*/
