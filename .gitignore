@@ -167,7 +167,6 @@ dist
 # Built Visual Studio Code Extensions
 *.vsix
 /config.json
-/rich.go
 ### VisualStudioCode Patch ###
 # Ignore all local history of files
 .history
@@ -176,3 +175,4 @@ cmd/gomcbe/build.bat
 # End of https://www.toptal.com/developers/gitignore/api/go,goland+all,node,visualstudiocode
 
 log/
+rich.go
