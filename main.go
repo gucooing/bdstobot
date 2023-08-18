@@ -76,11 +76,13 @@ func main() {
 			time.Sleep(10 * time.Second)
 		}
 	}()
-	go func() { //discord rich
-		for {
-			discord.Discordrich()
-		}
-	}()
+	/*
+		go func() { //discord rich
+			for {
+				discord.Discordrich()
+			}
+		}()
+	*/
 	for { //死循环保活+服务器状态监控
 		_, err := motd.MotdBE(config.GetConfig().Host)
 		if errorCount == 3 {
