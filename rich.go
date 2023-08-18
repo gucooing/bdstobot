@@ -1,4 +1,4 @@
-package discord
+package main
 
 import (
 	"time"
