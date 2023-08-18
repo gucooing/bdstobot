@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"github.com/gorilla/websocket"
 	"github.com/gucooing/bdstobot/config"
-	"github.com/gucooing/bdstobot/pgk/discord"
-	"github.com/gucooing/bdstobot/pgk/takeover"
+	"github.com/gucooing/bdstobot/internal/discord"
+	"github.com/gucooing/bdstobot/takeover"
 	"strconv"
 	"time"
 )

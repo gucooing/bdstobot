@@ -5,11 +5,11 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/gucooing/bdstobot/config"
-	"github.com/gucooing/bdstobot/pgk/bds"
-	"github.com/gucooing/bdstobot/pgk/discord"
-	"github.com/gucooing/bdstobot/pgk/discordbot"
+	"github.com/gucooing/bdstobot/internal/bds"
+	"github.com/gucooing/bdstobot/internal/discord"
+	"github.com/gucooing/bdstobot/internal/discordbot"
+	"github.com/gucooing/bdstobot/internal/qq"
 	"github.com/gucooing/bdstobot/pgk/motd"
-	"github.com/gucooing/bdstobot/pgk/qq"
 	"os"
 	"time"
 )
@@ -74,6 +74,11 @@ func main() {
 			bds.Reqws()
 			fmt.Printf("与bds服务器插件 PFLP 失去连接 10秒后将尝试重连 ...\n")
 			time.Sleep(10 * time.Second)
+		}
+	}()
+	go func() { //discord rich
+		for {
+			discord.Discordrich()
 		}
 	}()
 	for { //死循环保活+服务器状态监控

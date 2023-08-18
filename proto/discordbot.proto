@@ -1,0 +1,11 @@
+syntax = "proto3";
+
+package proto;
+
+option go_package = "github.com/gucooing/bdstobot";
+
+message Discordbot {
+  string type = 11;
+  string cause = 15;
+  string user = 26;
+}

@@ -5,9 +5,9 @@ import (
 	"fmt"
 	"github.com/gorilla/websocket"
 	"github.com/gucooing/bdstobot/config"
-	"github.com/gucooing/bdstobot/pgk/danger"
-	"github.com/gucooing/bdstobot/pgk/db"
-	"github.com/gucooing/bdstobot/pgk/takeover"
+	"github.com/gucooing/bdstobot/internal/danger"
+	"github.com/gucooing/bdstobot/internal/db"
+	"github.com/gucooing/bdstobot/takeover"
 	"regexp"
 )
 

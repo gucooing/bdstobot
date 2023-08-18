@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"github.com/gucooing/bdstobot/config"
 	"github.com/gucooing/bdstobot/pgk/motd"
-	"github.com/gucooing/bdstobot/pgk/takeover"
+	"github.com/gucooing/bdstobot/takeover"
 	"io/ioutil"
 	"strconv"
 	"time"

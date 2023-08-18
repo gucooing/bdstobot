@@ -8,8 +8,8 @@ import (
 	"github.com/gorilla/websocket"
 	"github.com/gucooing/bdstobot/config"
 	"github.com/gucooing/bdstobot/pgk/decrypt"
-	proto2 "github.com/gucooing/bdstobot/pgk/proto"
-	"github.com/gucooing/bdstobot/pgk/takeover"
+	proto2 "github.com/gucooing/bdstobot/proto"
+	"github.com/gucooing/bdstobot/takeover"
 )
 
 var (
