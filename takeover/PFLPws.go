@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"github.com/gorilla/websocket"
 	"github.com/gucooing/bdstobot/config"
-	"github.com/gucooing/bdstobot/pgk/encryption"
+	"github.com/gucooing/bdstobot/pkg/encryption"
 	jsoniter "github.com/json-iterator/go"
 )
 

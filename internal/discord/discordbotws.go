@@ -7,7 +7,7 @@ import (
 	"github.com/golang/protobuf/proto"
 	"github.com/gorilla/websocket"
 	"github.com/gucooing/bdstobot/config"
-	"github.com/gucooing/bdstobot/pgk/decrypt"
+	"github.com/gucooing/bdstobot/pkg/decrypt"
 	proto2 "github.com/gucooing/bdstobot/proto"
 	"github.com/gucooing/bdstobot/takeover"
 )

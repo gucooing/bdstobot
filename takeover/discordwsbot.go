@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"github.com/gorilla/websocket"
 	"github.com/gucooing/bdstobot/config"
-	"github.com/gucooing/bdstobot/pgk/encryption"
+	"github.com/gucooing/bdstobot/pkg/encryption"
 	jsoniter "github.com/json-iterator/go"
 )
 
@@ -59,7 +59,7 @@ func sendWSMessages(msg []byte) error {
 // SendWSMessagesi 定义发送函数
 func Discordbotwsreq(types, msg string) {
 	if types == "cmd" {
-		//newcmd, _ := pgk.Encrypt([]byte(msg))
+		//newcmd, _ := pkg.Encrypt([]byte(msg))
 		playe := Playe{
 			Type:   "pack",
 			Action: "runcmdrequest",

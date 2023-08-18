@@ -9,7 +9,7 @@ import (
 	"github.com/gucooing/bdstobot/internal/discord"
 	"github.com/gucooing/bdstobot/internal/discordbot"
 	"github.com/gucooing/bdstobot/internal/qq"
-	"github.com/gucooing/bdstobot/pgk/motd"
+	"github.com/gucooing/bdstobot/pkg/motd"
 	"os"
 	"time"
 )

@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/gucooing/bdstobot/config"
-	"github.com/gucooing/bdstobot/pgk/motd"
+	"github.com/gucooing/bdstobot/pkg/motd"
 	"github.com/gucooing/bdstobot/takeover"
 	"io/ioutil"
 	"strconv"
