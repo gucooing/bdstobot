@@ -10,6 +10,8 @@ import (
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/mattn/go-colorable"
 )
 
 const (
@@ -63,7 +65,7 @@ type LogInfo struct {
 func InitLogger() {
 	log.SetFlags(0)
 	LOG = new(Logger)
-	LOG.AppName = "ViaGenshin"
+	LOG.AppName = "BdsToBot"
 	LOG.Level = LOG.getLevelInt("DEBUG")
 	LOG.Mode = LOG.getModeInt("BOTH")
 	LOG.Track = true
@@ -88,6 +90,8 @@ func CloseLogger() {
 }
 
 func (l *Logger) doLog() {
+	stdout := colorable.NewColorableStdout()
+
 	for {
 		logInfo := <-l.LogInfoChan
 		timeNow := time.Now()
@@ -117,11 +121,11 @@ func (l *Logger) doLog() {
 		}
 		logStr += "\n"
 		if l.Mode == CONSOLE {
-			log.Print(logStr)
+			fmt.Fprint(stdout, logStr)
 		} else if l.Mode == FILE {
 			l.writeLogFile(logStr)
 		} else if l.Mode == BOTH {
-			log.Print(logStr)
+			fmt.Fprint(stdout, logStr)
 			l.writeLogFile(logStr)
 		}
 	}
