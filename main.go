@@ -25,11 +25,11 @@ func main() {
 			panic(err)
 		}
 	}
-	logger.Warn().Msg("    ___     __    _____    __")
-	logger.Warn().Msg("   /   |   / /   / ___/   / /")
-	logger.Warn().Msg("  / /| |  / /    \\__ \\   / /")
-	logger.Warn().Msg(" / ___ | / /___ ___/ /  / /___")
-	logger.Warn().Msg("/_/  |_|/_____//____/  /_____/")
+	logger.Info().Msg("    ___     __    _____    __")
+	logger.Info().Msg("   /   |   / /   / ___/   / /")
+	logger.Info().Msg("  / /| |  / /    \\__ \\   / /")
+	logger.Info().Msg(" / ___ | / /___ ___/ /  / /___")
+	logger.Info().Msg("/_/  |_|/_____//____/  /_____/")
 	if err != nil {
 		panic(err)
 	}

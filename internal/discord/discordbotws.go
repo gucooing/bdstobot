@@ -3,7 +3,6 @@ package discord
 import (
 	"encoding/base64"
 	"encoding/json"
-	"fmt"
 	"github.com/golang/protobuf/proto"
 	"github.com/gorilla/websocket"
 	"github.com/gucooing/bdstobot/config"
@@ -49,10 +48,9 @@ type Rsab struct {
 }
 
 func biswsdata(message []byte) string {
-	logger.Debug().Msgf("接收外置 discord bot 消息: %d\n", message)
+	logger.Debug().Msgf("接收外置 discord bot 消息: %d\n", string(message))
 	// 解析JSON
 	var rsab Rsab
-	fmt.Println(message)
 	err := json.Unmarshal(message, &rsab)
 	if err != nil {
 		logger.Warn().Msgf("解析JSON失败:%d", err)
