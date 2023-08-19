@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/gucooing/bdstobot/config"
+	"github.com/gucooing/bdstobot/pkg/logger"
 	"github.com/gucooing/bdstobot/pkg/motd"
 	"github.com/gucooing/bdstobot/takeover"
 	"io/ioutil"
@@ -25,16 +26,16 @@ func init() {
 	var err error
 	file, err := ioutil.ReadFile("config.json")
 	if err != nil {
-		fmt.Printf("无法读取配置文件: %v\n", err)
+		logger.Error().Msgf("无法读取配置文件: %d\n", err)
 	}
 	var nweconfig Config
 	err = json.Unmarshal(file, &nweconfig)
 	if err != nil {
-		fmt.Printf("配置文件解析错误: %v\n", err)
+		logger.Error().Msgf("配置文件解析错误: %d\n", err)
 	}
 	s, err = discordgo.New("Bot " + nweconfig.DiscordBotToken)
 	if err != nil {
-		fmt.Printf("discord bot token 无效: %v\n", err)
+		logger.Error().Msgf("discord bot token 无效: %d\n", err)
 	}
 }
 
@@ -109,7 +110,7 @@ var (
 				},
 			})
 			if err != nil {
-				fmt.Println(err)
+				logger.Warn().Msgf("执行指令ping错误：%d", err)
 				return
 			}
 		},
@@ -144,7 +145,7 @@ var (
 				},
 			})
 			if err != nil {
-				fmt.Println(err)
+				logger.Warn().Msgf("执行指令绑定错误：%d", err)
 				return
 			}
 		},
@@ -179,7 +180,7 @@ var (
 				},
 			})
 			if err != nil {
-				fmt.Println(err)
+				logger.Warn().Msgf("执行指令解绑错误：%d", err)
 				return
 			}
 		},
@@ -196,37 +197,37 @@ func init() {
 
 func DiscordBot() {
 	s.AddHandler(func(s *discordgo.Session, r *discordgo.Ready) {
-		fmt.Printf("登录bot: %v#%v\n", s.State.User.Username, s.State.User.Discriminator)
+		logger.Info().Msgf("登录bot: %d#%d\n", s.State.User.Username, s.State.User.Discriminator)
 	})
 
 	err := s.Open()
 	if err != nil {
-		fmt.Printf("bot无法连接到discord: %v\n", err)
+		logger.Warn().Msgf("bot无法连接到discord: %d\n", err)
 		return
 	}
 	file, err := ioutil.ReadFile("config.json")
 	if err != nil {
-		fmt.Printf("无法读取配置文件: %v\n", err)
+		logger.Warn().Msgf("无法读取配置文件: %d\n", err)
 		return
 	}
 	var nweconfig Config
 	err = json.Unmarshal(file, &nweconfig)
 	if err != nil {
-		fmt.Printf("配置文件解析错误: %v\n", err)
+		logger.Warn().Msgf("配置文件解析错误: %d\n", err)
 		return
 	}
 
-	fmt.Println("注册命令中...")
+	logger.Debug().Msg("注册命令中...")
 	registeredCommands := make([]*discordgo.ApplicationCommand, len(commands))
 	for i, v := range commands {
 		cmd, err := s.ApplicationCommandCreate(s.State.User.ID, nweconfig.GuildID, v)
 		if err != nil {
-			fmt.Printf("无法注册 '%v' 命令: %v\n", v.Name, err)
+			logger.Warn().Msgf("无法注册 '%d' 命令: %v\n", v.Name, err)
 			return
 		}
 		registeredCommands[i] = cmd
 	}
-	fmt.Println("discord bot 命令已成功注册 !")
+	logger.Debug().Msg("discord bot 命令已成功注册 !")
 	for {
 		// 阻塞携程，保持机器人在线
 		time.Sleep(10 * time.Second)

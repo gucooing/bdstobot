@@ -1,4 +1,5 @@
 {
+  "logLevel": "Info",
   "Host": "127.0.0.1:19132",
   "QQ": false,
   "QqAdmin": 123456789,

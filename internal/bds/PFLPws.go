@@ -2,10 +2,10 @@ package bds
 
 import (
 	"encoding/json"
-	"fmt"
 	"github.com/gorilla/websocket"
 	"github.com/gucooing/bdstobot/config"
 	"github.com/gucooing/bdstobot/internal/discord"
+	"github.com/gucooing/bdstobot/pkg/logger"
 	"github.com/gucooing/bdstobot/takeover"
 	"strconv"
 	"time"
@@ -26,7 +26,7 @@ func Reqws() {
 		if err := connpflp.Close(); err != nil {
 		}
 	}()
-	fmt.Println("PFLP ws 连接成功")
+	logger.Info().Msg("PFLP ws 连接成功")
 	for {
 		_, message, err := connpflp.ReadMessage()
 		if err != nil {
@@ -65,11 +65,11 @@ type EncryptParams struct {
 
 func reswsdata(message string) string {
 	// 解析JSON
-	//fmt.Printf("ws接收数据: %v\n", message)
+	logger.Debug().Msgf("接收 PFLP ws 消息: %d\n", message)
 	var playe Playe
 	err := json.Unmarshal([]byte(message), &playe)
 	if err != nil {
-		fmt.Println("解析 JSON 出错:", err)
+		logger.Warn().Msgf("解析 JSON 出错:%d", err)
 		return ""
 	}
 	times := time.Now().Unix()
@@ -94,14 +94,18 @@ func Nreswsdata(msg string) {
 	if config.GetConfig().QQ {
 		//发送QQ消息
 		takeover.Wscqhttpreq(msg)
+		logger.Debug().Msgf("发送QQ消息:%d", msg)
 	}
 	//发送discord webhook消息
 	discord.Discordwebhook(msg)
+	logger.Debug().Msgf("发送discord webhook消息:%d", msg)
 	//discord bot 主动发送消息 暂时无效
 	if config.GetConfig().DiscordBot {
 		//使用内置discord bot发送消息
+		logger.Debug().Msgf("使用内置discord bot发送消息:%d", msg)
 	} else {
 		//使用外置discord bot发送消息
+		logger.Debug().Msgf("使用外置discord bot发送消息:%d", msg)
 		//takeover.Discordbotwsreq("chat", msg)
 	}
 }

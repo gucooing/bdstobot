@@ -1,11 +1,14 @@
 package takeover
 
 import (
-	"fmt"
+	"encoding/json"
 	"github.com/gorilla/websocket"
 	"github.com/gucooing/bdstobot/config"
 	"github.com/gucooing/bdstobot/pkg/encryption"
+	"github.com/gucooing/bdstobot/pkg/logger"
 	jsoniter "github.com/json-iterator/go"
+	"strconv"
+	"time"
 )
 
 var connpflp *websocket.Conn
@@ -25,6 +28,51 @@ type Paramss struct {
 	Cmd    string `json:"cmd"`
 	Id     string `json:"id"`
 	Text   string `json:"text"`
+	Result string `json:"result"`
+}
+
+// Reqws 函数用于建立与 PFLP 的 WebSocket 连接
+func Pflpwsres() {
+	// 创建 WebSocket 连接
+	var err error
+	serverURL := config.GetConfig().PFLPWsurl
+	connpflp, _, err = websocket.DefaultDialer.Dial(serverURL, nil)
+	if err != nil {
+		logger.Warn().Msgf("连接 PFLP ws 失败：%d", err)
+		return
+	}
+	defer func() {
+		if err := connpflp.Close(); err != nil {
+		}
+	}()
+	logger.Info().Msg("PFLP ws 连接成功")
+	for {
+		_, message, err := connpflp.ReadMessage()
+		if err != nil {
+			logger.Warn().Msgf("接收PFLP ws 消息失败%d", err)
+			return
+		}
+		_ = reswsdata(string(message))
+	}
+}
+
+func reswsdata(message string) string {
+	// 解析JSON
+	logger.Debug().Msgf("接收PFLP ws 消息: %d\n", message)
+	var playe Playes
+	err := json.Unmarshal([]byte(message), &playe)
+	if err != nil {
+		logger.Warn().Msgf("解析 JSON 出错%d", err)
+		return ""
+	}
+	times := time.Now().Unix()
+	//未加密数据解析处理
+	if playe.Cause == "runcmdfeedback" {
+		cmdresult := playe.Params.Result
+		msg := "回调：" + cmdresult + "(<t:" + strconv.Itoa(int(times)) + ":R>)"
+		Wscqhttpreq(msg)
+	}
+	return ""
 }
 
 // SendWSMessage 定义发送函数
@@ -35,14 +83,14 @@ func sendWSMessage(msg []byte) error {
 		var err error
 		connpflp, _, err = websocket.DefaultDialer.Dial(serverURL, nil)
 		if err != nil {
-			fmt.Println(err)
+			logger.Warn().Msgf("连接 PFLP ws 失败：%d", err)
 			return err
 		}
 	}
 	// 发送消息
 	err := connpflp.WriteMessage(websocket.TextMessage, msg)
 	if err != nil {
-		fmt.Println(err)
+		logger.Warn().Msgf("发送PFLP ws 消息失败%d\n", err)
 		return err
 	}
 	return nil
@@ -62,7 +110,7 @@ func Pflpwsreq(types, msg string) {
 		jpkt, _ := jsoniter.Marshal(playe)
 		newplaye := encryption.Encrypt_send(string(jpkt))
 		// 发送消息
-		fmt.Printf("向 PFLP发送 发送数据: %v\n", string(newplaye))
+		logger.Debug().Msgf("向 PFLP发送 发送数据: %d\n", string(newplaye))
 		err := sendWSMessage(newplaye)
 		if err != nil {
 			return
@@ -81,9 +129,10 @@ func Pflpwsreq(types, msg string) {
 		jpkt, _ := jsoniter.Marshal(playe)
 		newplaye := encryption.Encrypt_send(string(jpkt))
 		// 发送消息
-		fmt.Printf("向 PFLP发送 发送数据: %v\n", string(newplaye))
+		logger.Debug().Msgf("向 PFLP发送 发送数据: %d\n", string(newplaye))
 		err := sendWSMessage(newplaye)
 		if err != nil {
+			logger.Warn().Msgf("发送PFLP ws 消息失败%d\n", err)
 			return
 		}
 	}

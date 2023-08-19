@@ -1,7 +1,7 @@
 package danger
 
 import (
-	"fmt"
+	"github.com/gucooing/bdstobot/pkg/logger"
 	"os/exec"
 )
 
@@ -9,12 +9,12 @@ func Cmdstart(msg string) string {
 	cmd := exec.Command("cmd.exe", "/C", msg)
 	err := cmd.Start()
 	if err != nil {
-		fmt.Println("执行失败:", err)
+		logger.Warn().Msgf("执行失败:%d", err)
 		return "执行失败"
 	}
 	err = cmd.Wait()
 	if err != nil {
-		fmt.Println("执行失败:", err)
+		logger.Warn().Msgf("执行失败:%d", err)
 		return "执行失败"
 	}
 	return "执行成功"

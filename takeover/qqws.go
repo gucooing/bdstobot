@@ -2,9 +2,9 @@ package takeover
 
 import (
 	"encoding/json"
-	"fmt"
 	"github.com/gorilla/websocket"
 	"github.com/gucooing/bdstobot/config"
+	"github.com/gucooing/bdstobot/pkg/logger"
 )
 
 var connqq *websocket.Conn = nil
@@ -17,12 +17,14 @@ func wscqhttpws(msg interface{}) error {
 		var err error
 		connqq, _, err = websocket.DefaultDialer.Dial(serverURL, nil)
 		if err != nil {
+			logger.Warn().Msgf("连接 cqhttp ws 失败：%d", err)
 			return err
 		}
 	}
 	// 发送消息
 	err := connqq.WriteJSON(msg)
 	if err != nil {
+		logger.Warn().Msgf("发送 cqhttp ws 消息失败：%d", err)
 		return err
 	}
 	return nil
@@ -54,9 +56,10 @@ func Wscqhttpreq(msg string) {
 	}
 	// 发送消息
 	reqdatajson, _ := json.Marshal(rsqdata)
-	fmt.Printf("发送QQ群聊数据: %v\n", string(reqdatajson))
+	logger.Debug().Msgf("发送QQ群聊数据: %d\n", string(reqdatajson))
 	err := wscqhttpws(rsqdata)
 	if err != nil {
+		logger.Warn().Msgf("发送 cqhttp ws 消息失败：%d", err)
 		return
 	}
 }

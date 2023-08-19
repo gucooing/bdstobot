@@ -8,6 +8,7 @@ import (
 	"encoding/base64"
 	"fmt"
 	"github.com/gucooing/bdstobot/config"
+	"github.com/gucooing/bdstobot/pkg/logger"
 	jsoniter "github.com/json-iterator/go"
 )
 
@@ -31,7 +32,7 @@ func Encrypt_send(str string) []byte {
 	}
 	pkt := encryptPkt{Params: Param{Mode: "aes_cbc_pck7padding", Raw: en}, Type: "encrypted"}
 	jpkt, _ := jsoniter.Marshal(pkt)
-	//fmt.Println(string(jpkt))
+	logger.Debug().Msgf("aes加密结果：%d", string(jpkt))
 	return jpkt
 
 }

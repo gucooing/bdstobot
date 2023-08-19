@@ -2,6 +2,7 @@ package db
 
 import (
 	"encoding/json"
+	"github.com/gucooing/bdstobot/pkg/logger"
 	"io/ioutil"
 )
 
@@ -14,6 +15,7 @@ func SaveGameInfo(qq int64, gamename string) bool {
 	// 读取已有的游戏信息
 	gameInfos, err := LoadGameInfos()
 	if err != nil {
+		logger.Warn().Msgf("读取 JSON 文件中游戏信息失败:%d", err)
 		// 如果读取失败，则创建一个新的切片用于存储游戏信息
 		gameInfos = make([]GameInfo, 0)
 	}
@@ -25,10 +27,12 @@ func SaveGameInfo(qq int64, gamename string) bool {
 	// 将游戏信息保存到 JSON 文件中
 	bytes, err := json.Marshal(gameInfos)
 	if err != nil {
+		logger.Warn().Msgf("将游戏信息保存到 JSON 文件中失败:%d", err)
 		return false
 	}
 	err = ioutil.WriteFile("data/game.json", bytes, 0644)
 	if err != nil {
+		logger.Warn().Msgf("写入 JSON 文件中失败:%d", err)
 		return false
 	}
 	return true
@@ -38,6 +42,7 @@ func DeleteGameInfoByQQ(qq int64) bool {
 	// 读取游戏信息
 	gameInfos, err := LoadGameInfos()
 	if err != nil {
+		logger.Warn().Msgf("读取 JSON 文件中游戏信息失败:%d", err)
 		return false
 	}
 
@@ -55,10 +60,12 @@ func DeleteGameInfoByQQ(qq int64) bool {
 	if found {
 		bytes, err := json.Marshal(gameInfos)
 		if err != nil {
+			logger.Warn().Msgf("将游戏信息保存到 JSON 文件中失败:%d", err)
 			return false
 		}
 		err = ioutil.WriteFile("data/game.json", bytes, 0644)
 		if err != nil {
+			logger.Warn().Msgf("写入 JSON 文件中失败:%d", err)
 			return false
 		}
 	} else {
@@ -71,6 +78,7 @@ func FindGameNameByQQ(qq int64) string {
 	// 读取游戏信息
 	gameInfos, err := LoadGameInfos()
 	if err != nil {
+		logger.Warn().Msgf("读取 JSON 文件中游戏信息失败:%d", err)
 		return ""
 	}
 
@@ -89,12 +97,14 @@ func LoadGameInfos() ([]GameInfo, error) {
 	// 从 JSON 文件中读取游戏信息
 	bytes, err := ioutil.ReadFile("data/game.json")
 	if err != nil {
+		logger.Warn().Msgf("读取 JSON 文件中游戏信息失败:%d", err)
 		return nil, err
 	}
 	// 解析 JSON 数据到切片中
 	var gameInfos []GameInfo
 	err = json.Unmarshal(bytes, &gameInfos)
 	if err != nil {
+		logger.Warn().Msgf("解析 JSON 文件中游戏信息失败:%d", err)
 		return nil, err
 	}
 	return gameInfos, nil

@@ -1,10 +1,10 @@
 package takeover
 
 import (
-	"fmt"
 	"github.com/gorilla/websocket"
 	"github.com/gucooing/bdstobot/config"
 	"github.com/gucooing/bdstobot/pkg/encryption"
+	"github.com/gucooing/bdstobot/pkg/logger"
 	jsoniter "github.com/json-iterator/go"
 )
 
@@ -45,12 +45,14 @@ func sendWSMessages(msg []byte) error {
 		var err error
 		conndiscordbot, _, err = websocket.DefaultDialer.Dial(serverURL, nil)
 		if err != nil {
+			logger.Warn().Msgf("连接外置 discord bot 失败：%d", err)
 			return err
 		}
 	}
 	// 发送消息
 	err := conndiscordbot.WriteMessage(websocket.TextMessage, msg)
 	if err != nil {
+		logger.Warn().Msgf("发送外置 discord bot 消息失败：%d", err)
 		return err
 	}
 	return nil
@@ -71,7 +73,7 @@ func Discordbotwsreq(types, msg string) {
 		jpkt, _ := jsoniter.Marshal(playe)
 		newplaye := encryption.Encrypt_send(string(jpkt))
 		// 发送消息
-		fmt.Printf("向 PFLP发送 发送数据: %v\n", string(newplaye))
+		logger.Debug().Msgf("向 PFLP发送 发送数据: %d\n", string(newplaye))
 		err := sendWSMessages(newplaye)
 		if err != nil {
 			return

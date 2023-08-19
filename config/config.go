@@ -7,6 +7,7 @@ import (
 )
 
 type Config struct {
+	LogLevel          string `json:"logLevel"`
 	Host              string `json:"Host"`
 	QQ                bool
 	QqAdmin           int64  `json:"Qqadmin"`
@@ -52,6 +53,7 @@ func LoadConfig() error {
 }
 
 var DefaultConfig = &Config{
+	LogLevel:          "Info",
 	Host:              "127.0.0.1:19132",
 	QQ:                false,
 	QqAdmin:           123456789,
