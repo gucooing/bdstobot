@@ -31,7 +31,7 @@ func Protoxor(content, sign string) string {
 	//解密结果的异或
 	newrsadata, _ := base64.StdEncoding.DecodeString(rsadata)
 	Xorec2b(newrsadata)
-	logger.Debug().Msgf("逆异或的结果是：%d", newrsadata)
+	logger.Debug().Msgf("逆异或的结果是：%d", string(newrsadata))
 	newnewrsadata := base64.StdEncoding.EncodeToString(newrsadata)
 	return newnewrsadata
 }

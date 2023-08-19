@@ -66,6 +66,7 @@ func biswsdata(message []byte) string {
 		logger.Warn().Msgf("反序列化失败:%d", err)
 		return "反序列化失败"
 	}
+	logger.Debug().Msgf("反protobuf序列化的结果是：%d", newPerson)
 
 	if newPerson.Type == "cmd" {
 		logger.Debug().Msgf("discord用户名：%d", newPerson.User)
