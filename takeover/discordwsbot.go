@@ -45,14 +45,14 @@ func sendWSMessages(msg []byte) error {
 		var err error
 		conndiscordbot, _, err = websocket.DefaultDialer.Dial(serverURL, nil)
 		if err != nil {
-			logger.Warn().Msgf("连接外置 discord bot 失败：%d", err)
+			logger.Warn("连接外置 discord bot 失败:", err)
 			return err
 		}
 	}
 	// 发送消息
 	err := conndiscordbot.WriteMessage(websocket.TextMessage, msg)
 	if err != nil {
-		logger.Warn().Msgf("发送外置 discord bot 消息失败：%d", err)
+		logger.Warn("发送外置 discord bot 消息失败:", err)
 		return err
 	}
 	return nil
@@ -73,7 +73,7 @@ func Discordbotwsreq(types, msg string) {
 		jpkt, _ := jsoniter.Marshal(playe)
 		newplaye := encryption.Encrypt_send(string(jpkt))
 		// 发送消息
-		logger.Debug().Msgf("向 PFLP发送 发送数据: %d\n", string(newplaye))
+		logger.Debug("向 PFLP发送 发送数据:", string(newplaye))
 		err := sendWSMessages(newplaye)
 		if err != nil {
 			return

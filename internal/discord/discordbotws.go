@@ -23,18 +23,18 @@ func Reqws() {
 	serverURL := config.GetConfig().DiscordWsurl
 	conndiscordbot, _, err = websocket.DefaultDialer.Dial(serverURL, nil)
 	if err != nil {
-		logger.Warn().Msgf("连接外置 discord bot 失败：%d", err)
+		logger.Warn("连接外置 discord bot 失败:", err)
 		return
 	}
 	defer func() {
 		if err := conndiscordbot.Close(); err != nil {
 		}
 	}()
-	logger.Info().Msg("外置 discord bot ws 连接成功")
+	logger.Info("外置 discord bot ws 连接成功")
 	for {
 		_, message, err := conndiscordbot.ReadMessage()
 		if err != nil {
-			logger.Warn().Msgf("监听外置 discord bot 消息失败：%d", err)
+			logger.Warn("监听外置 discord bot 消息失败:", err)
 			return
 		}
 		_ = biswsdata(message)
@@ -48,12 +48,12 @@ type Rsab struct {
 }
 
 func biswsdata(message []byte) string {
-	logger.Debug().Msgf("接收外置 discord bot 消息: %d\n", string(message))
+	logger.Debug("接收外置 discord bot 消息:", string(message))
 	// 解析JSON
 	var rsab Rsab
 	err := json.Unmarshal(message, &rsab)
 	if err != nil {
-		logger.Warn().Msgf("解析JSON失败:%d", err)
+		logger.Warn("解析JSON失败:", err)
 		return ""
 	}
 
@@ -63,13 +63,13 @@ func biswsdata(message []byte) string {
 	newPerson := &proto2.Discordbot{}
 	err = proto.Unmarshal(newdata, newPerson)
 	if err != nil {
-		logger.Warn().Msgf("反序列化失败:%d", err)
+		logger.Warn("反序列化失败:", err)
 		return "反序列化失败"
 	}
-	logger.Debug().Msgf("反protobuf序列化的结果是：%d", newPerson)
+	logger.Debug("反protobuf序列化的结果是:", newPerson)
 
 	if newPerson.Type == "cmd" {
-		logger.Debug().Msgf("discord用户名：%d", newPerson.User)
+		logger.Debug("discord用户名:", newPerson.User)
 		takeover.Pflpwsreq(newPerson.Type, newPerson.Cause)
 	}
 	return ""

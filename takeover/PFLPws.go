@@ -38,18 +38,18 @@ func Pflpwsres() {
 	serverURL := config.GetConfig().PFLPWsurl
 	connpflp, _, err = websocket.DefaultDialer.Dial(serverURL, nil)
 	if err != nil {
-		logger.Warn().Msgf("连接 PFLP ws 失败：%d", err)
+		logger.Warn("连接 PFLP ws 失败:", err)
 		return
 	}
 	defer func() {
 		if err := connpflp.Close(); err != nil {
 		}
 	}()
-	logger.Info().Msg("PFLP ws 连接成功")
+	logger.Info("PFLP ws 连接成功")
 	for {
 		_, message, err := connpflp.ReadMessage()
 		if err != nil {
-			logger.Warn().Msgf("接收PFLP ws 消息失败%d", err)
+			logger.Warn("接收PFLP ws 消息失败:", err)
 			return
 		}
 		_ = reswsdata(string(message))
@@ -58,11 +58,11 @@ func Pflpwsres() {
 
 func reswsdata(message string) string {
 	// 解析JSON
-	logger.Debug().Msgf("接收PFLP ws 消息: %d\n", message)
+	logger.Debug("接收PFLP ws 消息:", message)
 	var playe Playes
 	err := json.Unmarshal([]byte(message), &playe)
 	if err != nil {
-		logger.Warn().Msgf("解析 JSON 出错%d", err)
+		logger.Warn("解析 JSON 出错:", err)
 		return ""
 	}
 	times := time.Now().Unix()
@@ -83,14 +83,14 @@ func sendWSMessage(msg []byte) error {
 		var err error
 		connpflp, _, err = websocket.DefaultDialer.Dial(serverURL, nil)
 		if err != nil {
-			logger.Warn().Msgf("连接 PFLP ws 失败：%d", err)
+			logger.Warn("连接 PFLP ws 失败:", err)
 			return err
 		}
 	}
 	// 发送消息
 	err := connpflp.WriteMessage(websocket.TextMessage, msg)
 	if err != nil {
-		logger.Warn().Msgf("发送PFLP ws 消息失败%d\n", err)
+		logger.Warn("发送PFLP ws 消息失败:", err)
 		return err
 	}
 	return nil
@@ -110,7 +110,7 @@ func Pflpwsreq(types, msg string) {
 		jpkt, _ := jsoniter.Marshal(playe)
 		newplaye := encryption.Encrypt_send(string(jpkt))
 		// 发送消息
-		logger.Debug().Msgf("向 PFLP发送 发送数据: %d\n", string(newplaye))
+		logger.Debug("向 PFLP发送 发送数据:", string(newplaye))
 		err := sendWSMessage(newplaye)
 		if err != nil {
 			return
@@ -129,10 +129,10 @@ func Pflpwsreq(types, msg string) {
 		jpkt, _ := jsoniter.Marshal(playe)
 		newplaye := encryption.Encrypt_send(string(jpkt))
 		// 发送消息
-		logger.Debug().Msgf("向 PFLP发送 发送数据: %d\n", string(newplaye))
+		logger.Debug("向 PFLP发送 发送数据:", string(newplaye))
 		err := sendWSMessage(newplaye)
 		if err != nil {
-			logger.Warn().Msgf("发送PFLP ws 消息失败%d\n", err)
+			logger.Warn("发送PFLP ws 消息失败:", err)
 			return
 		}
 	}

@@ -33,16 +33,16 @@ func Reqws() {
 	serverURL := config.GetConfig().CqhttpWsurl
 	connqq, _, err = websocket.DefaultDialer.Dial(serverURL, nil)
 	if err != nil {
-		logger.Warn().Msgf("连接接收cqhttp失败：%d", err)
+		logger.Warn("连接接收cqhttp失败:", err)
 		return
 	}
 	defer func() {
 		if err := connqq.Close(); err != nil {
-			logger.Warn().Msgf("连接接收cqhttp失败：%d", err)
+			logger.Warn("连接接收cqhttp失败:", err)
 			return
 		}
 	}()
-	logger.Info().Msg("cqhttp ws 连接成功")
+	logger.Info("cqhttp ws 连接成功")
 	for {
 		_, message, err := connqq.ReadMessage()
 		if err != nil {
@@ -54,11 +54,11 @@ func Reqws() {
 
 func reswsdata(message []byte) {
 	// 解析JSON
-	logger.Debug().Msgf("接收 cqhttp ws 消息：%d", string(message))
+	logger.Debug("接收 cqhttp ws 消:", string(message))
 	var cqhttppost Cqhttppost
 	err := json.Unmarshal(message, &cqhttppost)
 	if err != nil {
-		logger.Warn().Msgf("解析JSON失败:%d", err)
+		logger.Warn("解析JSON失败:", err)
 		return
 	}
 
@@ -73,7 +73,7 @@ func reswsdata(message []byte) {
 	matches := re.FindStringSubmatch(cqhttppost.Message)
 	if len(matches) > 1 {
 		if cqhttppost.GroupId == config.GetConfig().QQgroup {
-			logger.Debug().Msgf("绑定的游戏昵称为：%d", matches[1])
+			logger.Debug("绑定的游戏昵称为:", matches[1])
 			dealwith.Tobind(cqhttppost.UserId, matches[1])
 			return
 		}
@@ -84,7 +84,7 @@ func reswsdata(message []byte) {
 		if cqhttppost.GroupId == config.GetConfig().QQgroup {
 			name := db.FindGameNameByQQ(cqhttppost.UserId)
 			if name != "" {
-				logger.Debug().Msgf("解绑的游戏昵称为：%d", name)
+				logger.Debug("解绑的游戏昵称为:", name)
 				dealwith.Untie(cqhttppost.UserId, name)
 				return
 			} else {
@@ -99,7 +99,7 @@ func reswsdata(message []byte) {
 	match := res.FindStringSubmatch(cqhttppost.Message)
 	if len(match) > 1 {
 		result := match[1]
-		logger.Debug().Msgf("接收QQ群聊转发消息：%d", result)
+		logger.Debug("接收QQ群聊转发消息:", result)
 		chat := "[" + cqhttppost.Sender.Nickname + "]QQ群聊消息：" + match[1]
 		takeover.Pflpwsreq("chat", chat)
 	}

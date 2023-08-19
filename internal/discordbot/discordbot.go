@@ -26,16 +26,16 @@ func init() {
 	var err error
 	file, err := ioutil.ReadFile("config.json")
 	if err != nil {
-		logger.Error().Msgf("无法读取配置文件: %d\n", err)
+		logger.Error("无法读取配置文件:", err)
 	}
 	var nweconfig Config
 	err = json.Unmarshal(file, &nweconfig)
 	if err != nil {
-		logger.Error().Msgf("配置文件解析错误: %d\n", err)
+		logger.Error("配置文件解析错误:", err)
 	}
 	s, err = discordgo.New("Bot " + nweconfig.DiscordBotToken)
 	if err != nil {
-		logger.Error().Msgf("discord bot token 无效: %d\n", err)
+		logger.Error("discord bot token 无效:", err)
 	}
 }
 
@@ -110,7 +110,7 @@ var (
 				},
 			})
 			if err != nil {
-				logger.Warn().Msgf("执行指令ping错误：%d", err)
+				logger.Warn("执行指令ping错误:", err)
 				return
 			}
 		},
@@ -132,7 +132,7 @@ var (
 				//建议在此进行逻辑处理
 				margss := "whitelist add " + option.StringValue()
 				takeover.Pflpwsreq("cmd", margss)
-				msgformat += "> 用户: %s\n> 游戏昵称: %s\n"
+				msgformat += "> 用户: %s\n> 游戏昵称: %s"
 			}
 
 			err := s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
@@ -145,7 +145,7 @@ var (
 				},
 			})
 			if err != nil {
-				logger.Warn().Msgf("执行指令绑定错误：%d", err)
+				logger.Warn("执行指令绑定错误:", err)
 				return
 			}
 		},
@@ -180,7 +180,7 @@ var (
 				},
 			})
 			if err != nil {
-				logger.Warn().Msgf("执行指令解绑错误：%d", err)
+				logger.Warn("执行指令解绑错误:", err)
 				return
 			}
 		},
@@ -197,37 +197,37 @@ func init() {
 
 func DiscordBot() {
 	s.AddHandler(func(s *discordgo.Session, r *discordgo.Ready) {
-		logger.Info().Msgf("登录bot: %d#%d\n", s.State.User.Username, s.State.User.Discriminator)
+		logger.Info("登录bot: %v#%v", s.State.User.Username, s.State.User.Discriminator)
 	})
 
 	err := s.Open()
 	if err != nil {
-		logger.Warn().Msgf("bot无法连接到discord: %d\n", err)
+		logger.Warn("bot无法连接到discord:", err)
 		return
 	}
 	file, err := ioutil.ReadFile("config.json")
 	if err != nil {
-		logger.Warn().Msgf("无法读取配置文件: %d\n", err)
+		logger.Warn("无法读取配置文件:", err)
 		return
 	}
 	var nweconfig Config
 	err = json.Unmarshal(file, &nweconfig)
 	if err != nil {
-		logger.Warn().Msgf("配置文件解析错误: %d\n", err)
+		logger.Warn("配置文件解析错误:", err)
 		return
 	}
 
-	logger.Debug().Msg("注册命令中...")
+	logger.Debug("注册命令中...")
 	registeredCommands := make([]*discordgo.ApplicationCommand, len(commands))
 	for i, v := range commands {
 		cmd, err := s.ApplicationCommandCreate(s.State.User.ID, nweconfig.GuildID, v)
 		if err != nil {
-			logger.Warn().Msgf("无法注册 '%d' 命令: %v\n", v.Name, err)
+			logger.Warn("无法注册 '%v' 命令: %v", err, v.Name)
 			return
 		}
 		registeredCommands[i] = cmd
 	}
-	logger.Debug().Msg("discord bot 命令已成功注册 !")
+	logger.Debug("discord bot 命令已成功注册 !")
 	for {
 		// 阻塞携程，保持机器人在线
 		time.Sleep(10 * time.Second)

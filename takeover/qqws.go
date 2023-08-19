@@ -17,14 +17,14 @@ func wscqhttpws(msg interface{}) error {
 		var err error
 		connqq, _, err = websocket.DefaultDialer.Dial(serverURL, nil)
 		if err != nil {
-			logger.Warn().Msgf("连接 cqhttp ws 失败：%d", err)
+			logger.Warn("连接 cqhttp ws 失败:", err)
 			return err
 		}
 	}
 	// 发送消息
 	err := connqq.WriteJSON(msg)
 	if err != nil {
-		logger.Warn().Msgf("发送 cqhttp ws 消息失败：%d", err)
+		logger.Warn("发送 cqhttp ws 消息失败:", err)
 		return err
 	}
 	return nil
@@ -56,10 +56,10 @@ func Wscqhttpreq(msg string) {
 	}
 	// 发送消息
 	reqdatajson, _ := json.Marshal(rsqdata)
-	logger.Debug().Msgf("发送QQ群聊数据: %d\n", string(reqdatajson))
+	logger.Debug("发送QQ群聊数据:", string(reqdatajson))
 	err := wscqhttpws(rsqdata)
 	if err != nil {
-		logger.Warn().Msgf("发送 cqhttp ws 消息失败：%d", err)
+		logger.Warn("发送 cqhttp ws 消息失败:", err)
 		return
 	}
 }

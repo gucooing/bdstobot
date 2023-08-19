@@ -19,32 +19,32 @@ var nerrorCount int
 func Start() {
 	//qq部分
 	if config.GetConfig().QQ { //是否启用QQ
-		logger.Info().Msg("开启使用cqhttp连接QQ\n")
+		logger.Info("开启使用cqhttp连接QQ")
 		go func() {
 			for {
 				qq.Reqws()
-				logger.Warn().Msg("cqhttp 失去连接 重连中 ...\n")
+				logger.Warn("cqhttp 失去连接 重连中 ...")
 				time.Sleep(5 * time.Second)
 			}
 		}()
 	}
 	//discord bot部分
 	if config.GetConfig().DiscordBot {
-		logger.Info().Msg("使用内置 discord bot\n")
+		logger.Info("使用内置 discord bot")
 		go func() {
 			for {
 				discordbot.DiscordBot()
-				logger.Warn().Msg("discord bot 失去连接 重连中 ...\n")
+				logger.Warn("discord bot 失去连接 重连中 ...")
 				time.Sleep(5 * time.Second)
 			}
 		}()
 	} else {
 		//连接外置discord bot
-		logger.Info().Msg("使用外置 discord bot\n")
+		logger.Info("使用外置 discord bot")
 		go func() {
 			for {
 				discord.Reqws()
-				logger.Warn().Msg("discord bot 失去连接 重连中 ...\n")
+				logger.Warn("discord bot 失去连接 重连中 ...")
 				time.Sleep(5 * time.Second)
 			}
 		}()
@@ -52,7 +52,7 @@ func Start() {
 	go func() { //连接PFLP ws
 		for {
 			bds.Reqws()
-			logger.Warn().Msg("与bds服务器插件 PFLP 失去连接 10秒后将尝试重连 ...\n")
+			logger.Warn("与bds服务器插件 PFLP 失去连接 10秒后将尝试重连 ...")
 			time.Sleep(10 * time.Second)
 		}
 	}()
@@ -65,21 +65,21 @@ func Start() {
 		data, err := motd.MotdBE(config.GetConfig().Host)
 		if errorCount == 3 {
 			bds.Nreswsdata("bds服务器掉线 尝试重连")
-			logger.Warn().Msg("bds服务器掉线 尝试重连")
+			logger.Warn("bds服务器掉线 尝试重连")
 			nerrorCount = 1
 		}
 		if err != nil {
 			errorCount++
-			logger.Warn().Msgf("获取motd状态失败 错误：%d", err)
+			logger.Warn("获取motd状态失败 错误:", err)
 			time.Sleep(3 * time.Second)
 			continue
 		}
 		if nerrorCount == 1 {
 			bds.Nreswsdata("bds服务器重连成功")
-			logger.Warn().Msg("bds服务器重连成功")
+			logger.Warn("bds服务器重连成功")
 		}
 		datajson, _ := json.Marshal(data)
-		logger.Debug().Msg(string(datajson))
+		logger.Debug("motd回调:", string(datajson))
 		errorCount = 0
 		nerrorCount = 0
 		time.Sleep(5 * time.Second)

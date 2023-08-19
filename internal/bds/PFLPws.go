@@ -26,7 +26,7 @@ func Reqws() {
 		if err := connpflp.Close(); err != nil {
 		}
 	}()
-	logger.Info().Msg("PFLP ws 连接成功")
+	logger.Info("PFLP ws 连接成功")
 	for {
 		_, message, err := connpflp.ReadMessage()
 		if err != nil {
@@ -65,11 +65,11 @@ type EncryptParams struct {
 
 func reswsdata(message string) string {
 	// 解析JSON
-	logger.Debug().Msgf("接收 PFLP ws 消息: %d\n", message)
+	logger.Debug("接收 PFLP ws 消息:", message)
 	var playe Playe
 	err := json.Unmarshal([]byte(message), &playe)
 	if err != nil {
-		logger.Warn().Msgf("解析 JSON 出错:%d", err)
+		logger.Warn("解析 JSON 出错:", err)
 		return ""
 	}
 	times := time.Now().Unix()
@@ -94,18 +94,18 @@ func Nreswsdata(msg string) {
 	if config.GetConfig().QQ {
 		//发送QQ消息
 		takeover.Wscqhttpreq(msg)
-		logger.Debug().Msgf("发送QQ消息:%d", msg)
+		logger.Debug("发送QQ消息:", msg)
 	}
 	//发送discord webhook消息
 	discord.Discordwebhook(msg)
-	logger.Debug().Msgf("发送discord webhook消息:%d", msg)
+	logger.Debug("发送discord webhook消息:", msg)
 	//discord bot 主动发送消息 暂时无效
 	if config.GetConfig().DiscordBot {
 		//使用内置discord bot发送消息
-		logger.Debug().Msgf("使用内置discord bot发送消息:%d", msg)
+		logger.Debug("使用内置discord bot发送消息:", msg)
 	} else {
 		//使用外置discord bot发送消息
-		logger.Debug().Msgf("使用外置discord bot发送消息:%d", msg)
+		logger.Debug("使用外置discord bot发送消息:", msg)
 		//takeover.Discordbotwsreq("chat", msg)
 	}
 }

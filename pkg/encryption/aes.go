@@ -32,7 +32,7 @@ func Encrypt_send(str string) []byte {
 	}
 	pkt := encryptPkt{Params: Param{Mode: "aes_cbc_pck7padding", Raw: en}, Type: "encrypted"}
 	jpkt, _ := jsoniter.Marshal(pkt)
-	logger.Debug().Msgf("aes加密结果：%d", string(jpkt))
+	logger.Debug("aes加密结果:", string(jpkt))
 	return jpkt
 
 }
