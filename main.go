@@ -29,12 +29,12 @@ func main() {
 	// 初始化日志
 	logger.InitLogger()
 	logger.SetLogLevel(strings.ToUpper(config.GetConfig().LogLevel))
-
 	logger.Info("    ___     __    _____    __")
 	logger.Info("   /   |   / /   / ___/   / /")
 	logger.Info("  / /| |  / /    \\__ \\   / /")
 	logger.Info(" / ___ | / /___ ___/ /  / /___")
 	logger.Info("/_/  |_|/_____//____/  /_____/")
 
+	// 启动服务器
 	internal.Start()
 }

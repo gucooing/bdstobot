@@ -74,18 +74,18 @@ func reswsdata(message string) string {
 	}
 	times := time.Now().Unix()
 	//未加密数据解析处理
-	if playe.Cause == "join" {
+	switch playe.Cause {
+	case "join":
 		msg := "玩家：" + playe.Params.Sender + " 偷偷的加入服务器.(<t:" + strconv.Itoa(int(times)) + ":R>)"
 		Nreswsdata(msg)
-	}
-	if playe.Cause == "left" {
+	case "left":
 		msg := "玩家：" + playe.Params.Sender + " 悄悄地退出服务器.(<t:" + strconv.Itoa(int(times)) + ":R>)"
 		Nreswsdata(msg)
-	}
-	if playe.Cause == "chat" {
+	case "chat":
 		msg := "玩家：" + playe.Params.Sender + " 说：" + playe.Params.Text + "(<t:" + strconv.Itoa(int(times)) + ":R>)"
 		Nreswsdata(msg)
 	}
+
 	return ""
 }
 

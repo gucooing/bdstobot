@@ -6,10 +6,11 @@ import (
 	"github.com/golang/protobuf/proto"
 	"github.com/gorilla/websocket"
 	"github.com/gucooing/bdstobot/config"
+	"github.com/gucooing/bdstobot/internal/dealwith"
 	"github.com/gucooing/bdstobot/pkg/decrypt"
 	"github.com/gucooing/bdstobot/pkg/logger"
 	proto2 "github.com/gucooing/bdstobot/proto"
-	"github.com/gucooing/bdstobot/takeover"
+	"strconv"
 )
 
 var (
@@ -68,9 +69,18 @@ func biswsdata(message []byte) string {
 	}
 	logger.Debug("反protobuf序列化的结果是:", newPerson)
 
-	if newPerson.Type == "cmd" {
+	switch newPerson.Type {
+	case "cmd":
 		logger.Debug("discord用户名:", newPerson.User)
-		takeover.Pflpwsreq(newPerson.Type, newPerson.Cause)
+		//takeover.Pflpwsreq(newPerson.Type, newPerson.Cause)
+	case "add":
+		logger.Debug("绑定 discord用户名:", newPerson.User)
+		username, _ := strconv.ParseInt(newPerson.User, 10, 64)
+		dealwith.Tobind(username, newPerson.Cause)
+	case "remove":
+		logger.Debug("解绑 discord用户名:", newPerson.User)
+		username, _ := strconv.ParseInt(newPerson.User, 10, 64)
+		dealwith.Untie(username, newPerson.Cause)
 	}
 	return ""
 }

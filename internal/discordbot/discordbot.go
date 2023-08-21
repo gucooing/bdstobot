@@ -4,9 +4,9 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/gucooing/bdstobot/config"
+	"github.com/gucooing/bdstobot/internal/dealwith"
 	"github.com/gucooing/bdstobot/pkg/logger"
 	"github.com/gucooing/bdstobot/pkg/motd"
-	"github.com/gucooing/bdstobot/takeover"
 	"io/ioutil"
 	"strconv"
 	"time"
@@ -125,17 +125,20 @@ var (
 			msgformat := "操作成功:\n"
 
 			user := i.Interaction.Member.User
-			username := user.Username
+			username, err := strconv.ParseInt(user.ID, 10, 64)
 
 			if option, ok := optionMap["绑定"]; ok {
 				margs = append(margs, username, option.StringValue())
 				//建议在此进行逻辑处理
-				margss := "whitelist add " + option.StringValue()
-				takeover.Pflpwsreq("cmd", margss)
+				dealwith.Tobind(username, option.StringValue())
+				/*
+					margss := "whitelist add " + option.StringValue()
+					takeover.Pflpwsreq("cmd", margss)
+				*/
 				msgformat += "> 用户: %s\n> 游戏昵称: %s"
 			}
 
-			err := s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+			err = s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
 				Type: discordgo.InteractionResponseChannelMessageWithSource,
 				Data: &discordgo.InteractionResponseData{
 					Content: fmt.Sprintf(
@@ -160,17 +163,18 @@ var (
 			msgformat := "操作成功:\n"
 
 			user := i.Interaction.Member.User
-			username := user.Username
+			username, err := strconv.ParseInt(user.ID, 10, 64)
 
 			if option, ok := optionMap["解绑"]; ok {
 				margs = append(margs, username, option.StringValue())
 				//建议在此进行逻辑处理
-				margss := "whitelist remove " + option.StringValue()
-				takeover.Pflpwsreq("cmd", margss)
+				dealwith.Tobind(username, option.StringValue())
+				//margss := "whitelist remove " + option.StringValue()
+				//takeover.Pflpwsreq("cmd", margss)
 				msgformat += "> 用户: %s\n> 游戏昵称: %s\n"
 			}
 
-			err := s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+			err = s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
 				Type: discordgo.InteractionResponseChannelMessageWithSource,
 				Data: &discordgo.InteractionResponseData{
 					Content: fmt.Sprintf(
