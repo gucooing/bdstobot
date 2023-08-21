@@ -81,9 +81,7 @@ jobs:
         GOARCH: arm
         
     - name: config
-      run: |
-        if not exist .\config mkdir .\config
-        copy .\config\config.json .
+      run: copy .\config\config.json .
     
     - name: Archive Linux artifacts
       uses: actions/upload-artifact@v3
