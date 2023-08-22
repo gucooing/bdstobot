@@ -2,11 +2,21 @@
 
 ### 连接bds插件[PFLP ws](https://github.com/PixelFaramita/PixelFaramitaLuminousPolymerizationRes) 然后与[QQ(cqhttp)](https://github.com/Mrs4s/go-cqhttp)/discord互通
 
-## 目前支持进、退服发送消息提醒（discord使用的是webhook）
+## 支持的功能：
 
-### 支持游戏内聊天与discord互通
+1.进、退服发送消息提醒（discord使用的是webhook）
 
-## 服务器状态监控（断线警告）
+2.执行指令（仅QQ）
+
+3.服务器状态获取（仅QQ）
+
+4.服务器状态监控（断线警告）
+
+5.服务器聊天与QQ群互通（discord目前仅支持单向互通）
+
+6.绑定，解绑服务器白名单
+
+7.远程启动服务器（仅QQ："mc 启动!"）
 
 ### 开发以discord bot为主（其实是QQ被风控不能发送消息）
 
