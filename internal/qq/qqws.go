@@ -8,8 +8,10 @@ import (
 	"github.com/gucooing/bdstobot/internal/db"
 	"github.com/gucooing/bdstobot/internal/dealwith"
 	"github.com/gucooing/bdstobot/pkg/logger"
+	"github.com/gucooing/bdstobot/pkg/state"
 	"github.com/gucooing/bdstobot/takeover"
 	"regexp"
+	"strconv"
 )
 
 var connqq *websocket.Conn = nil
@@ -62,9 +64,37 @@ func reswsdata(message []byte) {
 		return
 	}
 
-	if cqhttppost.Message == "mc 启动!" {
-		back := danger.Cmdstart("chcp 936 & start " + config.GetConfig().Mcpath)
-		takeover.Wscqhttpreq(back)
+	switch cqhttppost.Message {
+	case "mc 启动!":
+		if cqhttppost.UserId == config.GetConfig().QqAdmin {
+			back := danger.Cmdstart("chcp 936 & start " + config.GetConfig().Mcpath)
+			takeover.Wscqhttpreq(back)
+			return
+		} else {
+			takeover.Wscqhttpreq("您不是管理员！")
+			return
+		}
+	case "解绑":
+		if cqhttppost.GroupId == config.GetConfig().QQgroup {
+			name := db.FindGameNameByQQ(cqhttppost.UserId)
+			if name != "" {
+				logger.Debug("解绑的游戏昵称为:", name)
+				dealwith.Untie(cqhttppost.UserId, name)
+				return
+			} else {
+				takeover.Wscqhttpreq("您没有绑定")
+				return
+			}
+		}
+	case "服务器状态":
+		motddata, err := state.MotdBE(config.GetConfig().Host)
+		if err != nil {
+			logger.Warn("获取motd状态失败 错误:", err)
+			return
+		}
+		msg := "服务器版本:" + motddata.Version + "\n服务器支持的协议:" + strconv.Itoa(motddata.Agreement) + "\n在线玩家:" + strconv.Itoa(motddata.Online) + "\n服务器延迟:" + strconv.FormatInt(motddata.Delay, 10) + "\n内存使用情况:" + state.GetMemPercents() + "%\n内存使用量:" + state.GetMemPercent() + "\ncpu使用情况：" + state.GetCpuPercent() + "%\n"
+		logger.Debug("获取服务器状态:", msg)
+		takeover.Wscqhttpreq(msg)
 		return
 	}
 
@@ -79,21 +109,6 @@ func reswsdata(message []byte) {
 		}
 	}
 
-	//解绑
-	if cqhttppost.Message == "解绑" {
-		if cqhttppost.GroupId == config.GetConfig().QQgroup {
-			name := db.FindGameNameByQQ(cqhttppost.UserId)
-			if name != "" {
-				logger.Debug("解绑的游戏昵称为:", name)
-				dealwith.Untie(cqhttppost.UserId, name)
-				return
-			} else {
-				takeover.Wscqhttpreq("您没有绑定")
-				return
-			}
-		}
-	}
-
 	//聊天转发
 	res := regexp.MustCompile(`chat([^/]+)$`)
 	match := res.FindStringSubmatch(cqhttppost.Message)
@@ -102,6 +117,7 @@ func reswsdata(message []byte) {
 		logger.Debug("接收QQ群聊转发消息:", result)
 		chat := "[" + cqhttppost.Sender.Nickname + "]QQ群聊消息：" + match[1]
 		takeover.Pflpwsreq("chat", chat)
+		return
 	}
 
 	//管理员发送指令
@@ -111,8 +127,10 @@ func reswsdata(message []byte) {
 		if cqhttppost.UserId == config.GetConfig().QqAdmin {
 			//takeover.Wscqhttpreq("执行成功！")
 			takeover.Pflpwsreq("cmd", qqadmins[1])
+			return
 		} else {
 			takeover.Wscqhttpreq("您不是管理员！")
+			return
 		}
 	}
 

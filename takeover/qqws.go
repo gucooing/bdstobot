@@ -59,7 +59,6 @@ func Wscqhttpreq(msg string) {
 	logger.Debug("发送QQ群聊数据:", string(reqdatajson))
 	err := wscqhttpws(rsqdata)
 	if err != nil {
-		logger.Warn("发送 cqhttp ws 消息失败:", err)
 		return
 	}
 }

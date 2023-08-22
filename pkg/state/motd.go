@@ -1,5 +1,5 @@
 // MotdBE协议封装,爱来自 MotdBEAPI
-package motd
+package state
 
 import (
 	"encoding/hex"

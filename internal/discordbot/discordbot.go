@@ -6,7 +6,7 @@ import (
 	"github.com/gucooing/bdstobot/config"
 	"github.com/gucooing/bdstobot/internal/dealwith"
 	"github.com/gucooing/bdstobot/pkg/logger"
-	"github.com/gucooing/bdstobot/pkg/motd"
+	"github.com/gucooing/bdstobot/pkg/state"
 	"io/ioutil"
 	"strconv"
 	"time"
@@ -95,7 +95,7 @@ var (
 
 	commandHandlers = map[string]func(s *discordgo.Session, i *discordgo.InteractionCreate){
 		"ping": func(s *discordgo.Session, i *discordgo.InteractionCreate) {
-			data, _ := motd.MotdBE(config.GetConfig().Host)
+			data, _ := state.MotdBE(config.GetConfig().Host)
 			responses := map[discordgo.Locale]string{
 				discordgo.ChineseCN: "服务器延迟为：" + strconv.Itoa(int(data.Delay)),
 			}

@@ -8,7 +8,7 @@ import (
 	"github.com/gucooing/bdstobot/internal/discordbot"
 	"github.com/gucooing/bdstobot/internal/qq"
 	"github.com/gucooing/bdstobot/pkg/logger"
-	"github.com/gucooing/bdstobot/pkg/motd"
+	"github.com/gucooing/bdstobot/pkg/state"
 	"github.com/gucooing/bdstobot/takeover"
 	"time"
 )
@@ -62,7 +62,7 @@ func Start() {
 		}
 	}()
 	for { //死循环保活+服务器状态监控
-		data, err := motd.MotdBE(config.GetConfig().Host)
+		data, err := state.MotdBE(config.GetConfig().Host)
 		if errorCount == 3 {
 			bds.Nreswsdata("bds服务器掉线 尝试重连")
 			logger.Warn("bds服务器掉线 尝试重连")
@@ -76,7 +76,7 @@ func Start() {
 		}
 		if nerrorCount == 1 {
 			bds.Nreswsdata("bds服务器重连成功")
-			logger.Warn("bds服务器重连成功")
+			logger.Info("bds服务器重连成功")
 		}
 		datajson, _ := json.Marshal(data)
 		logger.Debug("motd回调:", string(datajson))
