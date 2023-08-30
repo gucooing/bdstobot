@@ -1,6 +1,7 @@
 {
   "logLevel": "Info",
   "Host": "127.0.0.1:19132",
+  "ZmHost": "127.0.0.1:16261",
   "QQ": false,
   "QqAdmin": 123456789,
   "QQgroup": 123456789,

@@ -78,6 +78,9 @@ func Start() {
 			bds.Nreswsdata("bds服务器重连成功")
 			logger.Info("bds服务器重连成功")
 		}
+		//datazm, err := state.MotdPm(config.GetConfig().ZmHost)
+		//datajsonzm, _ := json.Marshal(datazm)
+		//logger.Info("motd回调:", string(datajsonzm))
 		datajson, _ := json.Marshal(data)
 		logger.Debug("motd回调:", string(datajson))
 		errorCount = 0

@@ -9,6 +9,7 @@ import (
 type Config struct {
 	LogLevel          string `json:"logLevel"`
 	Host              string `json:"Host"`
+	ZmHost            string `json:"ZmHost"`
 	QQ                bool
 	QqAdmin           int64  `json:"Qqadmin"`
 	QQgroup           int64  `json:"QQgroup"`
@@ -55,6 +56,7 @@ func LoadConfig() error {
 var DefaultConfig = &Config{
 	LogLevel:          "Info",
 	Host:              "127.0.0.1:19132",
+	ZmHost:            "127.0.0.1:16261",
 	QQ:                false,
 	QqAdmin:           123456789,
 	QQgroup:           123456789,

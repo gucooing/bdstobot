@@ -40,8 +40,9 @@ func MotdPm(Host string) (*MotdPMInfo, error) {
 	}
 	defer socket.Close()
 	// 第一次发送数据
+	hexStr := "ffffffff54536f7572636520456e67696e6520517565727900"
 	time11 := time.Now().UnixNano() / 1e6 //记录发送时间
-	senddata11, _ := hex.DecodeString("ffffffff54536f7572636520456e67696e6520517565727900")
+	senddata11, _ := hex.DecodeString(hexStr)
 	_, err = socket.Write(senddata11)
 	if err != nil {
 		MotdInfo := &MotdPMInfo{
@@ -61,8 +62,7 @@ func MotdPm(Host string) (*MotdPMInfo, error) {
 	}
 	// 二次发送数据，将接收的数据按要求进行处理
 	hexStr1 := hex.EncodeToString(UDPdata11)
-	hexStr2 := "ffffffff54536f7572636520456e67696e6520517565727900"
-	hexStrCombined := hexStr2 + hexStr1[len(hexStr1)-8:]
+	hexStrCombined := hexStr + hexStr1[len(hexStr1)-8:]
 	// 转换回 16 进制字符串
 	senddata12, _ := hex.DecodeString(hexStrCombined)
 	_, err = socket.Write(senddata12)
