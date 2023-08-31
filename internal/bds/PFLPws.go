@@ -27,6 +27,18 @@ func Reqws() {
 		}
 	}()
 	logger.Info("PFLP ws 连接成功")
+	go func() {
+		for {
+			// 创建并发送 ping 消息
+			err := connpflp.WriteMessage(websocket.PingMessage, []byte{})
+			if err != nil {
+				logger.Warn("pflp ws ping 发送失败")
+				return
+			}
+
+			time.Sleep(30 * time.Second)
+		}
+	}()
 	for {
 		_, message, err := connpflp.ReadMessage()
 		if err != nil {

@@ -12,6 +12,7 @@ import (
 	"github.com/gucooing/bdstobot/takeover"
 	"regexp"
 	"strconv"
+	"time"
 )
 
 var connqq *websocket.Conn = nil
@@ -45,6 +46,18 @@ func Reqws() {
 		}
 	}()
 	logger.Info("cqhttp ws 连接成功")
+	go func() {
+		for {
+			// 创建并发送 ping 消息
+			err := connqq.WriteMessage(websocket.PingMessage, []byte{})
+			if err != nil {
+				logger.Warn("qq bot ping 发送失败")
+				return
+			}
+
+			time.Sleep(30 * time.Second)
+		}
+	}()
 	for {
 		_, message, err := connqq.ReadMessage()
 		if err != nil {

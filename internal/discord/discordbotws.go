@@ -11,6 +11,7 @@ import (
 	"github.com/gucooing/bdstobot/pkg/logger"
 	proto2 "github.com/gucooing/bdstobot/proto"
 	"strconv"
+	"time"
 )
 
 var (
@@ -32,6 +33,18 @@ func Reqws() {
 		}
 	}()
 	logger.Info("外置 discord bot ws 连接成功")
+	go func() {
+		for {
+			// 创建并发送 ping 消息
+			err := conndiscordbot.WriteMessage(websocket.PingMessage, []byte{})
+			if err != nil {
+				logger.Warn("discord bot ping 发送失败")
+				return
+			}
+
+			time.Sleep(30 * time.Second)
+		}
+	}()
 	for {
 		_, message, err := conndiscordbot.ReadMessage()
 		if err != nil {
