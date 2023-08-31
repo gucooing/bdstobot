@@ -48,6 +48,10 @@ func Reqws() {
 	logger.Info("cqhttp ws 连接成功")
 	go func() {
 		for {
+			// 检查是否已经存在连接
+			if connqq == nil {
+				return
+			}
 			// 创建并发送 ping 消息
 			err := connqq.WriteMessage(websocket.PingMessage, []byte{})
 			if err != nil {
@@ -59,6 +63,11 @@ func Reqws() {
 		}
 	}()
 	for {
+		// 检查是否已经存在连接
+		if connqq == nil {
+			return
+		}
+
 		_, message, err := connqq.ReadMessage()
 		if err != nil {
 			return

@@ -29,6 +29,10 @@ func Reqws() {
 	logger.Info("PFLP ws 连接成功")
 	go func() {
 		for {
+			// 检查是否已经存在连接
+			if connpflp == nil {
+				return
+			}
 			// 创建并发送 ping 消息
 			err := connpflp.WriteMessage(websocket.PingMessage, []byte{})
 			if err != nil {
@@ -37,9 +41,14 @@ func Reqws() {
 			}
 
 			time.Sleep(30 * time.Second)
+
 		}
 	}()
-	for {
+	for { // 检查是否已经存在连接
+		if connpflp == nil {
+			return
+		}
+		
 		_, message, err := connpflp.ReadMessage()
 		if err != nil {
 			return

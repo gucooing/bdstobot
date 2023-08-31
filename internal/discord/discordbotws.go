@@ -35,6 +35,10 @@ func Reqws() {
 	logger.Info("外置 discord bot ws 连接成功")
 	go func() {
 		for {
+			// 检查是否已经存在连接
+			if conndiscordbot == nil {
+				return
+			}
 			// 创建并发送 ping 消息
 			err := conndiscordbot.WriteMessage(websocket.PingMessage, []byte{})
 			if err != nil {
@@ -46,6 +50,11 @@ func Reqws() {
 		}
 	}()
 	for {
+		// 检查是否已经存在连接
+		if conndiscordbot == nil {
+			return
+		}
+
 		_, message, err := conndiscordbot.ReadMessage()
 		if err != nil {
 			logger.Warn("监听外置 discord bot 消息失败:", err)
