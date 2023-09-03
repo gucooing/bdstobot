@@ -5,32 +5,10 @@ import (
 	"github.com/gorilla/websocket"
 	"github.com/gucooing/bdstobot/config"
 	"github.com/gucooing/bdstobot/pkg/logger"
+	"time"
 )
 
-var connqq *websocket.Conn = nil
-
-// SendWSMessage 定义发送函数
-func wscqhttpws(msg interface{}) error {
-	// 检查是否已经存在连接
-	if connqq == nil {
-		serverURL := config.GetConfig().CqhttpWsurl
-		var err error
-		connqq, _, err = websocket.DefaultDialer.Dial(serverURL, nil)
-		if err != nil {
-			logger.Warn("连接 cqhttp ws 失败:", err)
-			return err
-		}
-	}
-	// 发送消息
-	err := connqq.WriteJSON(msg)
-	if err != nil {
-		logger.Warn("发送 cqhttp ws 消息失败:", err)
-		return err
-	}
-	return nil
-}
-
-// Params 定义发送结构体
+// Paramsqq 定义发送结构体
 type Paramsqq struct {
 	//MessageType string `json:"message_type"`
 	GroupId    int64  `json:"group_id"`
@@ -43,8 +21,41 @@ type Rsqdataqq struct {
 	Params *Paramsqq `json:"params"`
 }
 
-// SendWSMessagesi 定义群聊发送函数
 func Wscqhttpreq(msg string) {
+	serverURL := config.GetConfig().CqhttpWsurl
+	connqq, _, err := websocket.DefaultDialer.Dial(serverURL, nil)
+	if err != nil {
+		logger.Warn("连接 cqhttp ws 失败:", err)
+		return
+	}
+	defer func() {
+		if err := connqq.Close(); err != nil {
+		}
+	}()
+	logger.Debug("发送 cqhttp ws 连接成功")
+	msgg := cqhttpmsg(msg)
+	if msgg == nil {
+		logger.Warn("发送消息处理失败")
+		return
+	}
+	logger.Debug("向 cqhttp ws发送 发送数据:", string(msgg))
+	err = connqq.WriteMessage(websocket.TextMessage, msgg)
+	if err != nil {
+		logger.Warn("发送cqhttp ws 消息失败:", err)
+		return
+	}
+	logger.Debug("发送cqhttp ws 消息成功")
+	time.Sleep(3 * time.Second)
+	_, message, err := connqq.ReadMessage()
+	if err != nil {
+		logger.Warn("接收cqhttp ws 消息失败:", err)
+		return
+	}
+	logger.Debug("接收cqhttp ws 消息成功:", message)
+	return
+}
+
+func cqhttpmsg(msg string) []byte {
 	rsqdata := Rsqdataqq{
 		Action: "send_group_msg",
 		Params: &Paramsqq{
@@ -55,10 +66,9 @@ func Wscqhttpreq(msg string) {
 		},
 	}
 	// 发送消息
-	reqdatajson, _ := json.Marshal(rsqdata)
-	logger.Debug("发送QQ群聊数据:", string(reqdatajson))
-	err := wscqhttpws(rsqdata)
+	reqdatajson, err := json.Marshal(rsqdata)
 	if err != nil {
-		return
+		return nil
 	}
+	return reqdatajson
 }

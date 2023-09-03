@@ -28,7 +28,6 @@ type Paramss struct {
 	Result string `json:"result"`
 }
 
-// 重构发送部分，防止假死情况
 func Pflpwsreq(types, msg string) string {
 	serverURL := config.GetConfig().PFLPWsurl
 	connpflps, _, err := websocket.DefaultDialer.Dial(serverURL, nil)
