@@ -22,34 +22,36 @@ type Rsqdataqq struct {
 }
 
 func Wscqhttpreq(msg string) {
-	serverURL := config.GetConfig().CqhttpWsurl
-	connqq, _, err := websocket.DefaultDialer.Dial(serverURL, nil)
-	if err != nil {
-		logger.Warn("连接 cqhttp ws 失败:", err)
+	go func() {
+		serverURL := config.GetConfig().CqhttpWsurl
+		connqq, _, err := websocket.DefaultDialer.Dial(serverURL, nil)
+		if err != nil {
+			logger.Warn("连接 cqhttp ws 失败:", err)
+			return
+		}
+		defer connqq.Close()
+		logger.Debug("发送 cqhttp ws 连接成功")
+		msgg := cqhttpmsg(msg)
+		if msgg == nil {
+			logger.Warn("发送消息处理失败")
+			return
+		}
+		logger.Debug("向 cqhttp ws发送 发送数据:", string(msgg))
+		err = connqq.WriteMessage(websocket.TextMessage, msgg)
+		if err != nil {
+			logger.Warn("发送cqhttp ws 消息失败:", err)
+			return
+		}
+		logger.Debug("发送cqhttp ws 消息成功")
+		time.Sleep(1 * time.Second)
+		_, message, err := connqq.ReadMessage()
+		if err != nil {
+			logger.Warn("接收cqhttp ws 消息失败:", err)
+			return
+		}
+		logger.Debug("接收cqhttp ws 消息成功:", message)
 		return
-	}
-	defer connqq.Close()
-	logger.Debug("发送 cqhttp ws 连接成功")
-	msgg := cqhttpmsg(msg)
-	if msgg == nil {
-		logger.Warn("发送消息处理失败")
-		return
-	}
-	logger.Debug("向 cqhttp ws发送 发送数据:", string(msgg))
-	err = connqq.WriteMessage(websocket.TextMessage, msgg)
-	if err != nil {
-		logger.Warn("发送cqhttp ws 消息失败:", err)
-		return
-	}
-	logger.Debug("发送cqhttp ws 消息成功")
-	time.Sleep(3 * time.Second)
-	_, message, err := connqq.ReadMessage()
-	if err != nil {
-		logger.Warn("接收cqhttp ws 消息失败:", err)
-		return
-	}
-	logger.Debug("接收cqhttp ws 消息成功:", message)
-	return
+	}()
 }
 
 func cqhttpmsg(msg string) []byte {

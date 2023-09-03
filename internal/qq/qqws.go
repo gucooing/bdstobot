@@ -60,11 +60,13 @@ func Reqws() {
 	for {
 		// 检查是否已经存在连接
 		if connqq == nil {
+			logger.Warn("cqhttp ws 连接断开，退出循环返回主函数重连")
 			return
 		}
 
 		_, message, err := connqq.ReadMessage()
 		if err != nil {
+			logger.Error("cqhttp ws 接收失败,错误：", err)
 			return
 		}
 		reswsdata(message)
