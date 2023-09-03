@@ -118,7 +118,7 @@ func sendWSMessage(msg []byte) error {
 }
 
 // SendWSMessagesi 定义发送函数
-func Pflpwsreq(types, msg string) {
+func Pflpwsreq(types, msg string) bool {
 	if types == "cmd" {
 		playe := Playes{
 			Type:   "pack",
@@ -134,9 +134,9 @@ func Pflpwsreq(types, msg string) {
 		logger.Debug("向 PFLP发送 发送数据:", string(newplaye))
 		err := sendWSMessage(newplaye)
 		if err != nil {
-			return
+			return false
 		}
-		return
+		return true
 	}
 	if types == "chat" {
 		playe := Playes{
@@ -154,7 +154,8 @@ func Pflpwsreq(types, msg string) {
 		err := sendWSMessage(newplaye)
 		if err != nil {
 			logger.Warn("发送PFLP ws 消息失败:", err)
-			return
+			return false
 		}
 	}
+	return false
 }
