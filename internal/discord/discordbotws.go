@@ -28,10 +28,7 @@ func Reqws() {
 		logger.Warn("连接外置 discord bot 失败:", err)
 		return
 	}
-	defer func() {
-		if err := conndiscordbot.Close(); err != nil {
-		}
-	}()
+	defer conndiscordbot.Close()
 	logger.Info("外置 discord bot ws 连接成功")
 	go func() {
 		for {

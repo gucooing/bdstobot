@@ -28,10 +28,7 @@ func Wscqhttpreq(msg string) {
 		logger.Warn("连接 cqhttp ws 失败:", err)
 		return
 	}
-	defer func() {
-		if err := connqq.Close(); err != nil {
-		}
-	}()
+	defer connqq.Close()
 	logger.Debug("发送 cqhttp ws 连接成功")
 	msgg := cqhttpmsg(msg)
 	if msgg == nil {

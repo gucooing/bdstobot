@@ -22,10 +22,7 @@ func Reqws() {
 	if err != nil {
 		return
 	}
-	defer func() {
-		if err := connpflp.Close(); err != nil {
-		}
-	}()
+	defer connpflp.Close()
 	logger.Info("PFLP ws 连接成功")
 	go func() {
 		for {
@@ -48,7 +45,7 @@ func Reqws() {
 		if connpflp == nil {
 			return
 		}
-		
+
 		_, message, err := connpflp.ReadMessage()
 		if err != nil {
 			return

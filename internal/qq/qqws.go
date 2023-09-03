@@ -39,12 +39,7 @@ func Reqws() {
 		logger.Warn("连接接收cqhttp失败:", err)
 		return
 	}
-	defer func() {
-		if err := connqq.Close(); err != nil {
-			logger.Warn("连接接收cqhttp失败:", err)
-			return
-		}
-	}()
+	defer connqq.Close()
 	logger.Info("cqhttp ws 连接成功")
 	go func() {
 		for {
@@ -165,6 +160,10 @@ func reswsdata(message []byte) {
 		if cqhttppost.UserId == config.GetConfig().QqAdmin {
 			//takeover.Wscqhttpreq("执行成功！")
 			msg := danger.Cmdstart(qqadminssh[1])
+			if msg == "" {
+				takeover.Wscqhttpreq("错误的，无法执行的命令行")
+				return
+			}
 			takeover.Wscqhttpreq(msg)
 			return
 		} else {

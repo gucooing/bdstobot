@@ -35,10 +35,7 @@ func Pflpwsreq(types, msg string) string {
 		logger.Warn("发送pflpws连接失败，错误：", err)
 		return ""
 	}
-	defer func() {
-		if err := connpflps.Close(); err != nil {
-		}
-	}()
+	defer connpflps.Close()
 	logger.Debug("发送pflp ws 连接成功")
 	msgg := pflptype(types, msg)
 	if msgg == nil {

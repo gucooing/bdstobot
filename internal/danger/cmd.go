@@ -24,6 +24,7 @@ func Cmdstart(msg string) string {
 func execCmd(cmd []string) (string, error) {
 	command := exec.Command(cmd[0], cmd[1:]...)
 	output, err := command.Output()
+	defer command.Process.Release()
 	if err != nil {
 		return "", err
 	}
