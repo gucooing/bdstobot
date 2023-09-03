@@ -89,7 +89,7 @@ func reswsdata(message []byte) {
 	switch cqhttppost.Message {
 	case "mc 启动!":
 		if cqhttppost.UserId == config.GetConfig().QqAdmin {
-			back := danger.Cmdstart("chcp 936 & start " + config.GetConfig().Mcpath)
+			back := danger.Cmdstart("start " + config.GetConfig().Mcpath)
 			takeover.Wscqhttpreq(back)
 			return
 		} else {
@@ -150,6 +150,21 @@ func reswsdata(message []byte) {
 		if cqhttppost.UserId == config.GetConfig().QqAdmin {
 			//takeover.Wscqhttpreq("执行成功！")
 			msg := takeover.Pflpwsreq("cmd", qqadmins[1])
+			takeover.Wscqhttpreq(msg)
+			return
+		} else {
+			takeover.Wscqhttpreq("您不是管理员！")
+			return
+		}
+	}
+
+	//管理员发送命令
+	qqadminsh := regexp.MustCompile(`sh\s([^/]+)$`)
+	qqadminssh := qqadminsh.FindStringSubmatch(cqhttppost.Message)
+	if len(qqadminssh) > 1 {
+		if cqhttppost.UserId == config.GetConfig().QqAdmin {
+			//takeover.Wscqhttpreq("执行成功！")
+			msg := danger.Cmdstart(qqadminssh[1])
 			takeover.Wscqhttpreq(msg)
 			return
 		} else {

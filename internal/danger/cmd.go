@@ -1,21 +1,35 @@
 package danger
 
 import (
-	"github.com/gucooing/bdstobot/pkg/logger"
 	"os/exec"
+	"runtime"
 )
 
 func Cmdstart(msg string) string {
-	cmd := exec.Command("cmd.exe", "/C", msg)
-	err := cmd.Start()
-	if err != nil {
-		logger.Warn("执行失败:", err)
-		return "执行失败"
+	if isWindows() {
+		newmsg := "chcp 65001 & " + msg
+		output, err := execCmd([]string{"cmd", "/c", newmsg})
+		if err != nil {
+			return ""
+		}
+		return output
 	}
-	err = cmd.Wait()
+	output, err := execCmd([]string{"sh", "-c", msg})
 	if err != nil {
-		logger.Warn("执行失败:", err)
-		return "执行失败"
+		return ""
 	}
-	return "执行成功"
+	return output
+}
+
+func execCmd(cmd []string) (string, error) {
+	command := exec.Command(cmd[0], cmd[1:]...)
+	output, err := command.Output()
+	if err != nil {
+		return "", err
+	}
+	return string(output), nil
+}
+
+func isWindows() bool {
+	return runtime.GOOS == "windows"
 }
