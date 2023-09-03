@@ -138,7 +138,8 @@ func reswsdata(message []byte) {
 		result := match[1]
 		logger.Debug("接收QQ群聊转发消息:", result)
 		chat := "[" + cqhttppost.Sender.Nickname + "]QQ群聊消息：" + match[1]
-		_ = takeover.Pflpwsreq("chat", chat)
+		msg := takeover.Pflpwsreq("chat", chat)
+		takeover.Wscqhttpreq(msg)
 		return
 	}
 
@@ -148,7 +149,8 @@ func reswsdata(message []byte) {
 	if len(qqadmins) > 1 {
 		if cqhttppost.UserId == config.GetConfig().QqAdmin {
 			//takeover.Wscqhttpreq("执行成功！")
-			_ = takeover.Pflpwsreq("cmd", qqadmins[1])
+			msg := takeover.Pflpwsreq("cmd", qqadmins[1])
+			takeover.Wscqhttpreq(msg)
 			return
 		} else {
 			takeover.Wscqhttpreq("您不是管理员！")

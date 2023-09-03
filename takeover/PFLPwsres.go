@@ -7,13 +7,10 @@ import (
 	"github.com/gucooing/bdstobot/pkg/encryption"
 	"github.com/gucooing/bdstobot/pkg/logger"
 	jsoniter "github.com/json-iterator/go"
-	"strconv"
 	"time"
 )
 
-var connpflp *websocket.Conn
-
-// Playe 定义接收结构体
+// Playes 定义接收结构体
 type Playes struct {
 	Type   string   `json:"type"`
 	Cause  string   `json:"cause"`
@@ -31,95 +28,53 @@ type Paramss struct {
 	Result string `json:"result"`
 }
 
-// Reqws 函数用于建立与 PFLP 的 WebSocket 连接
-func Pflpwsres() {
-	// 创建 WebSocket 连接
-	var err error
+// 重构发送部分，防止假死情况
+func Pflpwsreq(types, msg string) string {
 	serverURL := config.GetConfig().PFLPWsurl
-	connpflp, _, err = websocket.DefaultDialer.Dial(serverURL, nil)
+	connpflps, _, err := websocket.DefaultDialer.Dial(serverURL, nil)
 	if err != nil {
-		logger.Warn("连接 PFLP ws 失败:", err)
-		return
+		logger.Warn("发送pflpws连接失败，错误：", err)
+		return ""
 	}
 	defer func() {
-		if err := connpflp.Close(); err != nil {
+		if err := connpflps.Close(); err != nil {
 		}
 	}()
-	logger.Info("PFLP ws 连接成功")
-	go func() {
-		for {
-			// 检查是否已经存在连接
-			if connpflp == nil {
-				return
-			}
-			// 创建并发送 ping 消息
-			err := connpflp.WriteMessage(websocket.PingMessage, []byte{})
-			if err != nil {
-				logger.Warn("pflp bot ping 发送失败")
-				return
-			}
-
-			time.Sleep(30 * time.Second)
-		}
-	}()
-	for {
-		// 检查是否已经存在连接
-		if connpflp == nil {
-			return
-		}
-
-		_, message, err := connpflp.ReadMessage()
-		if err != nil {
-			logger.Warn("接收PFLP ws 消息失败:", err)
-			return
-		}
-		_ = reswsdata(string(message))
+	logger.Debug("发送pflp ws 连接成功")
+	msgg := pflptype(types, msg)
+	if msgg == nil {
+		logger.Warn("pflp发送消息处理失败")
+		return ""
 	}
-}
-
-func reswsdata(message string) string {
-	// 解析JSON
-	logger.Debug("接收PFLP ws 消息:", message)
+	// 发送消息
+	logger.Debug("向 PFLP发送 发送数据:", string(msgg))
+	// 发送消息
+	err = connpflps.WriteMessage(websocket.TextMessage, msgg)
+	if err != nil {
+		logger.Warn("发送PFLP ws 消息失败:", err)
+		return ""
+	}
+	logger.Debug("发送PFLP ws 消息成功")
+	time.Sleep(3 * time.Second)
+	_, message, err := connpflps.ReadMessage()
+	if err != nil {
+		logger.Warn("接收PFLP ws 消息失败:", err)
+		return ""
+	}
+	logger.Debug("接收PFLP ws 消息成功:", message)
 	var playe Playes
-	err := json.Unmarshal([]byte(message), &playe)
+	err = json.Unmarshal([]byte(message), &playe)
 	if err != nil {
 		logger.Warn("解析 JSON 出错:", err)
 		return ""
 	}
-	times := time.Now().Unix()
-	//未加密数据解析处理
-	if playe.Cause == "runcmdfeedback" {
-		cmdresult := playe.Params.Result
-		msg := "回调：" + cmdresult + "(<t:" + strconv.Itoa(int(times)) + ":R>)"
-		Wscqhttpreq(msg)
-	}
-	return ""
+	return playe.Params.Result
 }
 
-// SendWSMessage 定义发送函数
-func sendWSMessage(msg []byte) error {
-	// 检查是否已经存在连接
-	if connpflp == nil {
-		serverURL := config.GetConfig().PFLPWsurl
-		var err error
-		connpflp, _, err = websocket.DefaultDialer.Dial(serverURL, nil)
-		if err != nil {
-			logger.Warn("连接 PFLP ws 失败:", err)
-			return err
-		}
-	}
-	// 发送消息
-	err := connpflp.WriteMessage(websocket.TextMessage, msg)
-	if err != nil {
-		logger.Warn("发送PFLP ws 消息失败:", err)
-		return err
-	}
-	return nil
-}
-
-// SendWSMessagesi 定义发送函数
-func Pflpwsreq(types, msg string) bool {
-	if types == "cmd" {
+// 通过type判断如何处理消息内容
+func pflptype(types, msg string) []byte {
+	switch types {
+	case "cmd":
 		playe := Playes{
 			Type:   "pack",
 			Action: "runcmdrequest",
@@ -130,15 +85,8 @@ func Pflpwsreq(types, msg string) bool {
 		}
 		jpkt, _ := jsoniter.Marshal(playe)
 		newplaye := encryption.Encrypt_send(string(jpkt))
-		// 发送消息
-		logger.Debug("向 PFLP发送 发送数据:", string(newplaye))
-		err := sendWSMessage(newplaye)
-		if err != nil {
-			return false
-		}
-		return true
-	}
-	if types == "chat" {
+		return newplaye
+	case "chat":
 		playe := Playes{
 			Type:   "pack",
 			Action: "sendtext",
@@ -149,13 +97,7 @@ func Pflpwsreq(types, msg string) bool {
 		}
 		jpkt, _ := jsoniter.Marshal(playe)
 		newplaye := encryption.Encrypt_send(string(jpkt))
-		// 发送消息
-		logger.Debug("向 PFLP发送 发送数据:", string(newplaye))
-		err := sendWSMessage(newplaye)
-		if err != nil {
-			logger.Warn("发送PFLP ws 消息失败:", err)
-			return false
-		}
+		return newplaye
 	}
-	return false
+	return nil
 }

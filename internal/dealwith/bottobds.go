@@ -14,12 +14,11 @@ func Tobind(UserId int64, name string) {
 		takeover.Wscqhttpreq("您已绑定")
 		return
 	} else {
-		if takeover.Pflpwsreq("cmd", margss) {
-
+		msg := takeover.Pflpwsreq("cmd", margss)
+		if msg != "" {
 			db.SaveGameInfo(UserId, name)
 			logger.Debug("用户：%v 绑定白名单成功！", namedata)
-			takeover.Wscqhttpreq("绑定白名单成功！")
-
+			takeover.Wscqhttpreq("绑定白名单成功！:" + msg)
 			return
 		} else {
 			logger.Warn("用户：%v 绑定白名单失败，错误出现在意外的地方", namedata)
@@ -31,11 +30,11 @@ func Tobind(UserId int64, name string) {
 
 func Untie(UserId int64, name string) {
 	margss := "whitelist remove " + name
-	if takeover.Pflpwsreq("cmd", margss) {
+	msg := takeover.Pflpwsreq("cmd", margss)
+	if msg != "" {
 		db.DeleteGameInfoByQQ(UserId)
-
 		logger.Debug("已获取用户：%v 白名单成功！", UserId)
-		takeover.Wscqhttpreq("解绑成功！")
+		takeover.Wscqhttpreq("解绑成功！:" + msg)
 
 		return
 	} else {

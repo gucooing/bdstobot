@@ -9,7 +9,6 @@ import (
 	"github.com/gucooing/bdstobot/internal/qq"
 	"github.com/gucooing/bdstobot/pkg/logger"
 	"github.com/gucooing/bdstobot/pkg/state"
-	"github.com/gucooing/bdstobot/takeover"
 	"time"
 )
 
@@ -54,11 +53,6 @@ func Start() {
 			bds.Reqws()
 			logger.Warn("与bds服务器插件 PFLP 失去连接 10秒后将尝试重连 ...")
 			time.Sleep(10 * time.Second)
-		}
-	}()
-	go func() { //discord rich
-		for {
-			takeover.Pflpwsres()
 		}
 	}()
 	for { //死循环保活+服务器状态监控
