@@ -51,7 +51,7 @@ func Pflpwsreq(types, msg string) string {
 		return ""
 	}
 	logger.Debug("发送PFLP ws 消息成功")
-	time.Sleep(3 * time.Second)
+	time.Sleep(1 * time.Second)
 	_, message, err := connpflps.ReadMessage()
 	if err != nil {
 		logger.Warn("接收PFLP ws 消息失败:", err)

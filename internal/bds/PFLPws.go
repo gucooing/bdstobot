@@ -50,7 +50,7 @@ func Reqws() {
 		if err != nil {
 			return
 		}
-		_ = reswsdata(string(message))
+		go reswsdata(string(message))
 	}
 }
 
@@ -81,14 +81,14 @@ type EncryptParams struct {
 	Raw  string `json:"raw"`
 }
 
-func reswsdata(message string) string {
+func reswsdata(message string) {
 	// 解析JSON
 	logger.Debug("接收 PFLP ws 消息:", message)
 	var playe Playe
 	err := json.Unmarshal([]byte(message), &playe)
 	if err != nil {
 		logger.Warn("解析 JSON 出错:", err)
-		return ""
+		return
 	}
 	times := time.Now().Unix()
 	//未加密数据解析处理
@@ -103,8 +103,7 @@ func reswsdata(message string) string {
 		msg := "玩家：" + playe.Params.Sender + " 说：" + playe.Params.Text + "(<t:" + strconv.Itoa(int(times)) + ":R>)"
 		Nreswsdata(msg)
 	}
-
-	return ""
+	return
 }
 
 // 传递逻辑再处理

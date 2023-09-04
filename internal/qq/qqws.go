@@ -69,7 +69,7 @@ func Reqws() {
 			logger.Error("cqhttp ws 接收失败,错误：", err)
 			return
 		}
-		reswsdata(message)
+		go reswsdata(message)
 	}
 }
 
