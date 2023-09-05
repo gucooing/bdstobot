@@ -22,10 +22,11 @@
   },
   "ZmHost": "127.0.0.1:16261",
   "Mysql": {
+    "Mysql": false,
     "Host": "127.0.0.1",
     "Port": "3306",
-    "Name": "root",
+    "Account": "root",
     "Password": "123456789",
-    "bd_table": "list"
+    "name": "list"
   }
 }

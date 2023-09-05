@@ -36,5 +36,7 @@ func main() {
 	logger.Info("/_/  |_|/_____//____/  /_____/")
 
 	// 启动服务器
+	//test := "{\"Name\":\"1872507219\",\"GameName\":\"xlpmyxhdr\"}"
+	//db.Mysqladd(test)
 	internal.Start()
 }

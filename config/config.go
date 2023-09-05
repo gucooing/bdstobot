@@ -39,11 +39,12 @@ type qq struct {
 }
 
 type mysql struct {
+	Mysql    bool   `json:"mysql"`
 	Host     string `json:"host"`
 	Port     string `json:"port"`
-	Name     string `json:"name"`
+	Account  string `json:"account"`
 	Password string `json:"password"`
-	BdTable  string `json:"bd_table"`
+	Name     string `json:"name"`
 }
 
 var CONF *Config = nil
@@ -99,10 +100,11 @@ var DefaultConfig = &Config{
 	},
 	ZmHost: "127.0.0.1:16261",
 	Mysql: &mysql{
+		Mysql:    false,
 		Host:     "127.0.0.1",
 		Port:     "3306",
-		Name:     "root",
+		Account:  "root",
 		Password: "123456789",
-		BdTable:  "list",
+		Name:     "list",
 	},
 }

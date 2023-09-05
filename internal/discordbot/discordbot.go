@@ -14,17 +14,6 @@ import (
 
 var s *discordgo.Session
 
-/*
-func init() {
-	var err error
-	s, err = discordgo.New("Bot " + config.GetConfig().Discord.DiscordBotToken)
-	if err != nil {
-		logger.Error("discord bot token 无效:", err)
-	}
-}
-
-*/
-
 var (
 	integerOptionMinValue          = 1.0
 	dmPermission                   = false
@@ -176,17 +165,6 @@ var (
 		},
 	}
 )
-
-/*
-func init() {
-	s.AddHandler(func(s *discordgo.Session, i *discordgo.InteractionCreate) {
-		if h, ok := commandHandlers[i.ApplicationCommandData().Name]; ok {
-			h(s, i)
-		}
-	})
-}
-
-*/
 
 func DiscordBot() {
 	var err error
