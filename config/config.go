@@ -8,6 +8,7 @@ import (
 
 type Config struct {
 	LogLevel          string `json:"logLevel"`
+	Port              string `json:"port"`
 	Host              string `json:"Host"`
 	ZmHost            string `json:"ZmHost"`
 	QQ                bool
@@ -55,6 +56,7 @@ func LoadConfig() error {
 
 var DefaultConfig = &Config{
 	LogLevel:          "Info",
+	Port:              "8080",
 	Host:              "127.0.0.1:19132",
 	ZmHost:            "127.0.0.1:16261",
 	QQ:                false,

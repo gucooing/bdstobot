@@ -11,6 +11,17 @@ type GameInfo struct {
 	GameName string `json:"gamename"`
 }
 
+func SaveGameUserList() string {
+	// 读取游戏信息
+	gameInfos, err := LoadGameInfos()
+	if err != nil {
+		logger.Warn("读取 JSON 文件中游戏绑定信息失败:", err)
+		return ""
+	}
+	userlist, err := json.Marshal(gameInfos)
+	return string(userlist)
+}
+
 func SaveGameInfo(qq int64, gamename string) bool {
 	// 读取已有的游戏信息
 	gameInfos, err := LoadGameInfos()
