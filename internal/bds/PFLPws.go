@@ -17,7 +17,7 @@ var connpflp *websocket.Conn
 func Reqws() {
 	// 创建 WebSocket 连接
 	var err error
-	serverURL := config.GetConfig().PFLPWsurl
+	serverURL := config.GetConfig().Pflp.PFLPWsurl
 	connpflp, _, err = websocket.DefaultDialer.Dial(serverURL, nil)
 	if err != nil {
 		return
@@ -108,7 +108,7 @@ func reswsdata(message string) {
 
 // 传递逻辑再处理
 func Nreswsdata(msg string) {
-	if config.GetConfig().QQ {
+	if config.GetConfig().QQ.QQ {
 		//发送QQ消息
 		takeover.Wscqhttpreq(msg)
 		logger.Debug("发送QQ消息:", msg)
@@ -117,7 +117,7 @@ func Nreswsdata(msg string) {
 	discord.Discordwebhook(msg)
 	logger.Debug("发送discord webhook消息:", msg)
 	//discord bot 主动发送消息 暂时无效
-	if config.GetConfig().DiscordBot {
+	if config.GetConfig().Discord.DiscordBot {
 		//使用内置discord bot发送消息
 		logger.Debug("使用内置discord bot发送消息:", msg)
 	} else {

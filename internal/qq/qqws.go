@@ -33,7 +33,7 @@ type sender struct {
 func Reqws() {
 	// 创建 WebSocket 连接
 	var err error
-	serverURL := config.GetConfig().CqhttpWsurl
+	serverURL := config.GetConfig().QQ.CqhttpWsurl
 	connqq, _, err = websocket.DefaultDialer.Dial(serverURL, nil)
 	if err != nil {
 		logger.Warn("连接接收cqhttp失败:", err)
@@ -85,7 +85,7 @@ func reswsdata(message []byte) {
 
 	switch cqhttppost.Message {
 	case "mc 启动!":
-		if cqhttppost.UserId == config.GetConfig().QqAdmin {
+		if cqhttppost.UserId == config.GetConfig().QQ.QqAdmin {
 			back := danger.Cmdstart("start " + config.GetConfig().Mcpath)
 			takeover.Wscqhttpreq(back)
 			return
@@ -94,7 +94,7 @@ func reswsdata(message []byte) {
 			return
 		}
 	case "解绑":
-		if cqhttppost.GroupId == config.GetConfig().QQgroup {
+		if cqhttppost.GroupId == config.GetConfig().QQ.QQgroup {
 			name := db.FindGameNameByQQ(cqhttppost.UserId)
 			if name != "" {
 				logger.Debug("解绑的游戏昵称为:", name)
@@ -121,7 +121,7 @@ func reswsdata(message []byte) {
 	re := regexp.MustCompile(`^绑定\s+(.*)$`)
 	matches := re.FindStringSubmatch(cqhttppost.Message)
 	if len(matches) > 1 {
-		if cqhttppost.GroupId == config.GetConfig().QQgroup {
+		if cqhttppost.GroupId == config.GetConfig().QQ.QQgroup {
 			logger.Debug("绑定的游戏昵称为:", matches[1])
 			dealwith.Tobind(cqhttppost.UserId, matches[1])
 			return
@@ -144,7 +144,7 @@ func reswsdata(message []byte) {
 	qqadmin := regexp.MustCompile(`cmd\s([^/]+)$`)
 	qqadmins := qqadmin.FindStringSubmatch(cqhttppost.Message)
 	if len(qqadmins) > 1 {
-		if cqhttppost.UserId == config.GetConfig().QqAdmin {
+		if cqhttppost.UserId == config.GetConfig().QQ.QqAdmin {
 			//takeover.Wscqhttpreq("执行成功！")
 			msg := takeover.Pflpwsreq("cmd", qqadmins[1])
 			takeover.Wscqhttpreq(msg)
@@ -159,7 +159,7 @@ func reswsdata(message []byte) {
 	qqadminsh := regexp.MustCompile(`sh\s([^/]+)$`)
 	qqadminssh := qqadminsh.FindStringSubmatch(cqhttppost.Message)
 	if len(qqadminssh) > 1 {
-		if cqhttppost.UserId == config.GetConfig().QqAdmin {
+		if cqhttppost.UserId == config.GetConfig().QQ.QqAdmin {
 			//takeover.Wscqhttpreq("执行成功！")
 			msg := danger.Cmdstart(qqadminssh[1])
 			if msg == "" {

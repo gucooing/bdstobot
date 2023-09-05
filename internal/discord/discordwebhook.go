@@ -9,7 +9,7 @@ import (
 )
 
 func Discordwebhook(msg string) {
-	url := config.GetConfig().DiscordWebhookUrl
+	url := config.GetConfig().Discord.DiscordWebhookUrl
 	body := "{\"content\": \"" + msg + "\", \"username\": \"MCBDS\", \"avatar_url\": \"https://webusstatic.yo-star.com/bluearchive_jp_web/fankit/162704158443017840/01.png\"}"
 	response, err := http.Post(url, "application/json", bytes.NewBuffer([]byte(body)))
 	if err != nil {

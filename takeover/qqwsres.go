@@ -23,7 +23,7 @@ type Rsqdataqq struct {
 
 func Wscqhttpreq(msg string) {
 	go func() {
-		serverURL := config.GetConfig().CqhttpWsurl
+		serverURL := config.GetConfig().QQ.CqhttpWsurl
 		connqq, _, err := websocket.DefaultDialer.Dial(serverURL, nil)
 		if err != nil {
 			logger.Warn("连接 cqhttp ws 失败:", err)
@@ -59,7 +59,7 @@ func cqhttpmsg(msg string) []byte {
 		Action: "send_group_msg",
 		Params: &Paramsqq{
 			//MessageType: "private",
-			GroupId:    config.GetConfig().QQgroup,
+			GroupId:    config.GetConfig().QQ.QQgroup,
 			Message:    msg,
 			AutoEscape: false,
 		},

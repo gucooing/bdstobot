@@ -1,43 +1,29 @@
 package discordbot
 
 import (
-	"encoding/json"
 	"fmt"
 	"github.com/gucooing/bdstobot/config"
 	"github.com/gucooing/bdstobot/internal/dealwith"
 	"github.com/gucooing/bdstobot/pkg/logger"
 	"github.com/gucooing/bdstobot/pkg/state"
-	"io/ioutil"
 	"strconv"
 	"time"
 
 	"github.com/bwmarrin/discordgo"
 )
 
-type Config struct {
-	GuildID         string `json:"GuildID"`
-	DiscordBotToken string `json:"DiscordBotToken"`
-	RemoveCommands  bool   `json:"RemoveCommands"`
-}
-
 var s *discordgo.Session
 
+/*
 func init() {
 	var err error
-	file, err := ioutil.ReadFile("config.json")
-	if err != nil {
-		logger.Error("无法读取配置文件:", err)
-	}
-	var nweconfig Config
-	err = json.Unmarshal(file, &nweconfig)
-	if err != nil {
-		logger.Error("配置文件解析错误:", err)
-	}
-	s, err = discordgo.New("Bot " + nweconfig.DiscordBotToken)
+	s, err = discordgo.New("Bot " + config.GetConfig().Discord.DiscordBotToken)
 	if err != nil {
 		logger.Error("discord bot token 无效:", err)
 	}
 }
+
+*/
 
 var (
 	integerOptionMinValue          = 1.0
@@ -191,6 +177,7 @@ var (
 	}
 )
 
+/*
 func init() {
 	s.AddHandler(func(s *discordgo.Session, i *discordgo.InteractionCreate) {
 		if h, ok := commandHandlers[i.ApplicationCommandData().Name]; ok {
@@ -199,32 +186,34 @@ func init() {
 	})
 }
 
+*/
+
 func DiscordBot() {
+	var err error
+	s, err = discordgo.New("Bot " + config.GetConfig().Discord.DiscordBotToken)
+	if err != nil {
+		logger.Error("discord bot token 无效:", err)
+	}
+
+	s.AddHandler(func(s *discordgo.Session, i *discordgo.InteractionCreate) {
+		if h, ok := commandHandlers[i.ApplicationCommandData().Name]; ok {
+			h(s, i)
+		}
+	})
+
 	s.AddHandler(func(s *discordgo.Session, r *discordgo.Ready) {
 		logger.Info("登录bot: %v#%v", s.State.User.Username, s.State.User.Discriminator)
 	})
 
-	err := s.Open()
+	err = s.Open()
 	if err != nil {
 		logger.Warn("bot无法连接到discord:", err)
 		return
 	}
-	file, err := ioutil.ReadFile("config.json")
-	if err != nil {
-		logger.Warn("无法读取配置文件:", err)
-		return
-	}
-	var nweconfig Config
-	err = json.Unmarshal(file, &nweconfig)
-	if err != nil {
-		logger.Warn("配置文件解析错误:", err)
-		return
-	}
-
 	logger.Debug("注册命令中...")
 	registeredCommands := make([]*discordgo.ApplicationCommand, len(commands))
 	for i, v := range commands {
-		cmd, err := s.ApplicationCommandCreate(s.State.User.ID, nweconfig.GuildID, v)
+		cmd, err := s.ApplicationCommandCreate(s.State.User.ID, config.GetConfig().Discord.GuildID, v)
 		if err != nil {
 			logger.Warn("无法注册 '%v' 命令: %v", err, v.Name)
 			return

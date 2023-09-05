@@ -1,17 +1,31 @@
 {
-  "logLevel": "Info",
+  "LogLevel": "Info",
+  "Port": "8080",
   "Host": "127.0.0.1:19132",
+  "Pflp": {
+    "PFLPWsurl": "ws://127.0.0.1:80",
+    "Key": "1234567890"
+  },
+  "QQ": {
+    "QQ": false,
+    "QqAdmin": 123456789,
+    "QQgroup": 123456789,
+    "CqhttpWsurl": "ws://127.0.0.1:80"
+  },
+  "Discord": {
+    "DiscordWebhookUrl": "https://127.0.0.1",
+    "DiscordBot": false,
+    "DiscordWsurl": "ws://127.0.0.1:80",
+    "DiscordBotToken": "1234567890",
+    "GuildID": ""
+  },
   "ZmHost": "127.0.0.1:16261",
-  "QQ": false,
-  "QqAdmin": 123456789,
-  "QQgroup": 123456789,
-  "CqhttpWsurl": "ws://127.0.0.1:80",
-  "PFLPWsurl": "ws://127.0.0.1:80",
-  "DiscordWebhookUrl": "https://127.0.0.1",
-  "DiscordBot": false,
-  "DiscordWsurl": "ws://127.0.0.1:80",
-  "DiscordBotToken": "1234567890",
-  "GuildID": "",
-  "key":"1234567890",
-  "Mcpath": "D:\\bedrock_server.exe"
+  "Mcpath": "D:\\bedrock_server.exe",
+  "Mysql": {
+    "Host": "127.0.0.1",
+    "Port": "3306",
+    "Name": "root",
+    "Password": "123456789",
+    "bd_table": "list"
+  }
 }

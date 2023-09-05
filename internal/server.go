@@ -23,7 +23,7 @@ func Start() {
 		time.Sleep(5 * time.Second)
 	}()
 	//qq部分
-	if config.GetConfig().QQ { //是否启用QQ
+	if config.GetConfig().QQ.QQ { //是否启用QQ
 		logger.Info("开启使用cqhttp连接QQ")
 		go func() {
 			for {
@@ -34,7 +34,7 @@ func Start() {
 		}()
 	}
 	//discord bot部分
-	if config.GetConfig().DiscordBot {
+	if config.GetConfig().Discord.DiscordBot {
 		logger.Info("使用内置 discord bot")
 		go func() {
 			for {

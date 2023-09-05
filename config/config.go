@@ -7,22 +7,43 @@ import (
 )
 
 type Config struct {
-	LogLevel          string `json:"logLevel"`
-	Port              string `json:"port"`
-	Host              string `json:"Host"`
-	ZmHost            string `json:"ZmHost"`
-	QQ                bool
-	QqAdmin           int64  `json:"Qqadmin"`
-	QQgroup           int64  `json:"QQgroup"`
-	CqhttpWsurl       string `json:"CqhttpWsurl"`
-	PFLPWsurl         string `json:"PFLPWsurl"`
+	LogLevel string `json:"logLevel"`
+	Port     string `json:"port"`
+	Host     string `json:"Host"`
+	Pflp     *pflp
+	QQ       *qq
+	Discord  *discord
+	ZmHost   string `json:"ZmHost"`
+	Mcpath   string `json:"mcpath"`
+	Mysql    *mysql
+}
+
+type pflp struct {
+	PFLPWsurl string `json:"PFLPWsurl"`
+	Key       string `json:"Key"`
+}
+
+type discord struct {
 	DiscordWebhookUrl string `json:"DiscordWebhookUrl"`
 	DiscordBot        bool
 	DiscordWsurl      string `json:"DiscordWsurl"`
 	DiscordBotToken   string `json:"DiscordBotToken"`
 	GuildID           string `json:"GuildID"`
-	Key               string `json:"Key"`
-	Mcpath            string `json:"mcpath"`
+}
+
+type qq struct {
+	QQ          bool
+	QqAdmin     int64  `json:"Qqadmin"`
+	QQgroup     int64  `json:"QQgroup"`
+	CqhttpWsurl string `json:"CqhttpWsurl"`
+}
+
+type mysql struct {
+	Host     string `json:"host"`
+	Port     string `json:"port"`
+	Name     string `json:"name"`
+	Password string `json:"password"`
+	BdTable  string `json:"bd_table"`
 }
 
 var CONF *Config = nil
@@ -55,20 +76,33 @@ func LoadConfig() error {
 }
 
 var DefaultConfig = &Config{
-	LogLevel:          "Info",
-	Port:              "8080",
-	Host:              "127.0.0.1:19132",
-	ZmHost:            "127.0.0.1:16261",
-	QQ:                false,
-	QqAdmin:           123456789,
-	QQgroup:           123456789,
-	CqhttpWsurl:       "ws://127.0.0.1:80",
-	PFLPWsurl:         "ws://127.0.0.1:80",
-	DiscordWebhookUrl: "https://127.0.0.1",
-	DiscordBot:        false,
-	DiscordWsurl:      "ws://127.0.0.1:80",
-	DiscordBotToken:   "1234567890",
-	GuildID:           "",
-	Key:               "1234567890",
-	Mcpath:            "D:\\bedrock_server.exe",
+	LogLevel: "Info",
+	Port:     "8080",
+	Host:     "127.0.0.1:19132",
+	Pflp: &pflp{
+		PFLPWsurl: "ws://127.0.0.1:80",
+		Key:       "1234567890",
+	},
+	QQ: &qq{
+		QQ:          false,
+		QqAdmin:     123456789,
+		QQgroup:     123456789,
+		CqhttpWsurl: "ws://127.0.0.1:80",
+	},
+	Discord: &discord{
+		DiscordWebhookUrl: "https://127.0.0.1",
+		DiscordBot:        false,
+		DiscordWsurl:      "ws://127.0.0.1:80",
+		DiscordBotToken:   "1234567890",
+		GuildID:           "",
+	},
+	ZmHost: "127.0.0.1:16261",
+	Mcpath: "D:\\bedrock_server.exe",
+	Mysql: &mysql{
+		Host:     "127.0.0.1",
+		Port:     "3306",
+		Name:     "root",
+		Password: "123456789",
+		BdTable:  "list",
+	},
 }

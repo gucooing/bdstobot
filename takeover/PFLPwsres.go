@@ -29,7 +29,7 @@ type Paramss struct {
 }
 
 func Pflpwsreq(types, msg string) string {
-	serverURL := config.GetConfig().PFLPWsurl
+	serverURL := config.GetConfig().Pflp.PFLPWsurl
 	connpflps, _, err := websocket.DefaultDialer.Dial(serverURL, nil)
 	if err != nil {
 		logger.Warn("发送pflpws连接失败，错误：", err)

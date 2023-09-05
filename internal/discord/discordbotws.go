@@ -22,7 +22,7 @@ var (
 func Reqws() {
 	// 创建 WebSocket 连接
 	var err error
-	serverURL := config.GetConfig().DiscordWsurl
+	serverURL := config.GetConfig().Discord.DiscordWsurl
 	conndiscordbot, _, err = websocket.DefaultDialer.Dial(serverURL, nil)
 	if err != nil {
 		logger.Warn("连接外置 discord bot 失败:", err)

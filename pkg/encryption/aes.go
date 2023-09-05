@@ -38,7 +38,7 @@ func Encrypt_send(str string) []byte {
 }
 
 func AESBase64Encrypt(origin_data string) (base64_result string, err error) {
-	keymd5 := md5.Sum([]byte(config.GetConfig().Key))
+	keymd5 := md5.Sum([]byte(config.GetConfig().Pflp.Key))
 	newkeymd5 = []byte(fmt.Sprintf("%X", keymd5))
 	key := newkeymd5[:16]
 	iv := newkeymd5[16:32]

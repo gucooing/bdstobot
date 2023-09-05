@@ -41,7 +41,7 @@ type EncryptParams struct {
 func sendWSMessages(msg []byte) error {
 	// 检查是否已经存在连接
 	if conndiscordbot == nil {
-		serverURL := config.GetConfig().DiscordWsurl
+		serverURL := config.GetConfig().Discord.DiscordWsurl
 		var err error
 		conndiscordbot, _, err = websocket.DefaultDialer.Dial(serverURL, nil)
 		if err != nil {
