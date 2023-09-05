@@ -81,7 +81,7 @@ var (
 
 	commandHandlers = map[string]func(s *discordgo.Session, i *discordgo.InteractionCreate){
 		"ping": func(s *discordgo.Session, i *discordgo.InteractionCreate) {
-			data, _ := state.MotdBE(config.GetConfig().Host)
+			data, _ := state.MotdBE(config.GetConfig().McHost)
 			responses := map[discordgo.Locale]string{
 				discordgo.ChineseCN: "服务器延迟为：" + strconv.Itoa(int(data.Delay)),
 			}

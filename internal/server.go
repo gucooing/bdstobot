@@ -62,7 +62,7 @@ func Start() {
 		}
 	}()
 	for { //死循环保活+服务器状态监控
-		data, err := state.MotdBE(config.GetConfig().Host)
+		data, err := state.MotdBE(config.GetConfig().McHost)
 		if errorCount == 3 {
 			bds.Nreswsdata("bds服务器掉线 尝试重连")
 			logger.Warn("bds服务器掉线 尝试重连")

@@ -106,7 +106,7 @@ func reswsdata(message []byte) {
 			}
 		}
 	case "服务器状态":
-		motddata, err := state.MotdBE(config.GetConfig().Host)
+		motddata, err := state.MotdBE(config.GetConfig().McHost)
 		if err != nil {
 			logger.Warn("获取motd状态失败 错误:", err)
 			return

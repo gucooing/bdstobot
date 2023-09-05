@@ -1,7 +1,8 @@
 {
   "LogLevel": "Info",
   "Port": "8080",
-  "Host": "127.0.0.1:19132",
+  "McHost": "127.0.0.1:19132",
+  "Mcpath": "D:\\bedrock_server.exe",
   "Pflp": {
     "PFLPWsurl": "ws://127.0.0.1:80",
     "Key": "1234567890"
@@ -20,7 +21,6 @@
     "GuildID": ""
   },
   "ZmHost": "127.0.0.1:16261",
-  "Mcpath": "D:\\bedrock_server.exe",
   "Mysql": {
     "Host": "127.0.0.1",
     "Port": "3306",

@@ -9,12 +9,12 @@ import (
 type Config struct {
 	LogLevel string `json:"logLevel"`
 	Port     string `json:"port"`
-	Host     string `json:"Host"`
+	McHost   string `json:"McHost"`
+	Mcpath   string `json:"Mcpath"`
 	Pflp     *pflp
 	QQ       *qq
 	Discord  *discord
 	ZmHost   string `json:"ZmHost"`
-	Mcpath   string `json:"mcpath"`
 	Mysql    *mysql
 }
 
@@ -78,7 +78,8 @@ func LoadConfig() error {
 var DefaultConfig = &Config{
 	LogLevel: "Info",
 	Port:     "8080",
-	Host:     "127.0.0.1:19132",
+	McHost:   "127.0.0.1:19132",
+	Mcpath:   "D:\\bedrock_server.exe",
 	Pflp: &pflp{
 		PFLPWsurl: "ws://127.0.0.1:80",
 		Key:       "1234567890",
@@ -97,7 +98,6 @@ var DefaultConfig = &Config{
 		GuildID:           "",
 	},
 	ZmHost: "127.0.0.1:16261",
-	Mcpath: "D:\\bedrock_server.exe",
 	Mysql: &mysql{
 		Host:     "127.0.0.1",
 		Port:     "3306",
