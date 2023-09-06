@@ -7,10 +7,12 @@ import (
 	"github.com/gucooing/bdstobot/config"
 	"github.com/gucooing/bdstobot/internal/db"
 	"github.com/gucooing/bdstobot/pkg/logger"
+	"mime"
 	"net"
 	"net/http"
 	"os"
 	"os/exec"
+	"path/filepath"
 	"sync"
 )
 
@@ -20,10 +22,12 @@ var (
 )
 
 type Server struct {
-	config *config.Config
-	Store  *db.Store
-	router *gin.Engine
-	server *http.Server
+	config      *config.Config
+	Store       *db.Store
+	router      *gin.Engine
+	server      *http.Server
+	staticFiles map[string][]byte
+	jsonFiles   map[string][]byte
 }
 
 func NewServer(cfg *config.Config) *Server {
@@ -39,7 +43,7 @@ func NewServer(cfg *config.Config) *Server {
 	s.router = gin.New()
 	s.router.Use(gin.Recovery())
 	s.router.LoadHTMLFiles("data/html/index.html")
-	s.router.NoRoute(gin.WrapH(http.FileServer(http.Dir("static"))))
+	s.router.Static("/static", "./data/html/static") //静态文件路径
 
 	return s
 }
@@ -94,6 +98,31 @@ func (s *Server) Shutdown(context.Context) error {
 		return nil
 	}
 	return s.server.Close()
+}
+
+func (s *Server) getJSONFile(path string) ([]byte, bool) {
+	data, ok := s.jsonFiles[path]
+	return data, ok
+}
+func (s *Server) getStaticFile(path string) ([]byte, bool) {
+	data, ok := s.staticFiles[path]
+	return data, ok
+}
+func (s *Server) handleStaticRequest(c *gin.Context) {
+	path := c.Request.URL.Path
+
+	data, ok := s.getStaticFile(path)
+	if !ok {
+		c.Status(http.StatusNotFound)
+		return
+	}
+
+	contentType := mime.TypeByExtension(filepath.Ext(path))
+	if contentType == "" {
+		contentType = "application/octet-stream"
+	}
+
+	c.Data(http.StatusOK, contentType, data)
 }
 
 func clientIPMiddleware() gin.HandlerFunc {

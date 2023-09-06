@@ -13,7 +13,7 @@ var data []Wlist
 
 type Store struct {
 	config *config.Config
-	db     *gorm.DB
+	Db     *gorm.DB
 }
 
 // 结构体
@@ -32,7 +32,7 @@ func (s *Store) init() {
 	name := s.config.Mysql.Name
 
 	dsn := account + ":" + password + "@tcp(" + host + ":" + prot + ")/" + name + "?charset=utf8mb4&parseTime=True&loc=Local"
-	s.db, err = gorm.Open(mysql.Open(dsn), &gorm.Config{
+	s.Db, err = gorm.Open(mysql.Open(dsn), &gorm.Config{
 		NamingStrategy: schema.NamingStrategy{
 			SingularTable: true,
 		},
@@ -41,7 +41,7 @@ func (s *Store) init() {
 		logger.Error("mysql数据库连接失败:", err)
 		return
 	}
-	sqlDB, err := s.db.DB()
+	sqlDB, err := s.Db.DB()
 	// SetMaxIdleConns 设置空闲连接池中连接的最大数量
 	sqlDB.SetMaxIdleConns(10)
 	// SetMaxOpenConns 设置打开数据库连接的最大数量。
@@ -50,7 +50,7 @@ func (s *Store) init() {
 	sqlDB.SetConnMaxLifetime(10 * time.Second) // 10 秒钟
 	//defer sqlDB.Close()
 
-	s.db.AutoMigrate(&Wlist{})
+	s.Db.AutoMigrate(&Wlist{})
 }
 
 // NewStore 创建一个新的 store。
@@ -62,7 +62,7 @@ func NewStore(config *config.Config) *Store {
 
 // 查全部
 func (s *Store) Mysqllistand(total int64, pageSize, offsetVal int, datal *Wlist) []Wlist {
-	s.db.Model(datal).Count(&total).Limit(pageSize).Offset(offsetVal).Find(&data)
+	s.Db.Model(datal).Count(&total).Limit(pageSize).Offset(offsetVal).Find(&data)
 	if len(data) == 0 {
 		return nil
 	} else {
@@ -72,7 +72,7 @@ func (s *Store) Mysqllistand(total int64, pageSize, offsetVal int, datal *Wlist)
 
 // 查一个
 func (s *Store) Mysqllist(id string) bool {
-	s.db.Where("id = ?", id).First(&data)
+	s.Db.Where("id = ?", id).First(&data)
 	if len(data) == 0 {
 		return false
 	}
@@ -81,20 +81,20 @@ func (s *Store) Mysqllist(id string) bool {
 
 // 增加
 func (s *Store) Mysqladd(data *Wlist) {
-	s.db.Create(&data)
+	s.Db.Create(&data)
 }
 
 // 删
 func (s *Store) Mysqldelete(id string) bool {
-	s.db.Where("id = ?", id).First(&data)
+	s.Db.Where("id = ?", id).First(&data)
 	if len(data) == 0 {
 		return false
 	}
-	s.db.Where("id = ?", id).Delete(&data)
+	s.Db.Where("id = ?", id).Delete(&data)
 	return true
 }
 
 // 改
 func (s *Store) Mysqlupdate(id string, data *Wlist) {
-	s.db.Where("id = ?", id).Updates(&data)
+	s.Db.Where("id = ?", id).Updates(&data)
 }

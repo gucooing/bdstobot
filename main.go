@@ -40,15 +40,13 @@ func main() {
 	logger.Info(" / ___ | / /___ ___/ /  / /___")
 	logger.Info("/_/  |_|/_____//____/  /_____/")
 
-	// 启动服务器
-	//test := "{\"Name\":\"1872507219\",\"GameName\":\"xlpmyxhdr\"}"
-	//db.Mysqladd(test)
 	cfg := config.GetConfig()
 	httpsrv := http.NewServer(cfg)
 	if httpsrv == nil {
 		fmt.Print("服务器初始化失败")
 		return
 	}
+
 	done := make(chan os.Signal, 1)
 	signal.Notify(done, os.Interrupt, syscall.SIGINT, syscall.SIGTERM)
 
@@ -77,15 +75,17 @@ func main() {
 			case <-done:
 				// 添加停止服务
 				restartTicker.Stop()
+				logger.Info("关闭mysql数据库连接")
+				sqlDB, _ := httpsrv.Store.Db.DB()
 				logger.Info("HTTP服务正在关闭")
 				ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 				defer cancel()
+				sqlDB.Close()
 				if err := httpsrv.Shutdown(ctx); err != nil {
 					logger.Error("无法正常关闭HTTP服务")
 				}
 				logger.Info("HTTP服务已停止")
 				os.Exit(0) // 将终止程序
-
 			}
 		}
 	}()
