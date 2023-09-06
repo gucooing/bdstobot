@@ -38,5 +38,12 @@ func main() {
 	// 启动服务器
 	//test := "{\"Name\":\"1872507219\",\"GameName\":\"xlpmyxhdr\"}"
 	//db.Mysqladd(test)
+	cfg := config.GetConfig()
+	httpsrv := internal.NewMysql(cfg)
+	if httpsrv == nil {
+		fmt.Print("服务器初始化失败")
+		return
+	}
+
 	internal.Start()
 }
