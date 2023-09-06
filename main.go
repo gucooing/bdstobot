@@ -2,13 +2,18 @@ package main
 
 import (
 	"bufio"
+	"context"
 	"encoding/json"
 	"fmt"
 	"github.com/gucooing/bdstobot/config"
 	"github.com/gucooing/bdstobot/internal"
+	"github.com/gucooing/bdstobot/internal/http"
 	"github.com/gucooing/bdstobot/pkg/logger"
 	"os"
+	"os/signal"
 	"strings"
+	"syscall"
+	"time"
 )
 
 func main() {
@@ -39,11 +44,51 @@ func main() {
 	//test := "{\"Name\":\"1872507219\",\"GameName\":\"xlpmyxhdr\"}"
 	//db.Mysqladd(test)
 	cfg := config.GetConfig()
-	httpsrv := internal.NewMysql(cfg)
+	httpsrv := http.NewServer(cfg)
 	if httpsrv == nil {
 		fmt.Print("服务器初始化失败")
 		return
 	}
+	done := make(chan os.Signal, 1)
+	signal.Notify(done, os.Interrupt, syscall.SIGINT, syscall.SIGTERM)
+
+	go func() {
+		if err := httpsrv.Start(); err != nil {
+			logger.Error("无法启动HTTP服务器")
+		}
+	}()
+
+	restartTicker := time.NewTicker(time.Duration(999999999) * time.Second)
+	go func() {
+		for {
+			select {
+			case <-restartTicker.C:
+				logger.Info("正在重启服务器...")
+				ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+				defer cancel()
+				if err := httpsrv.Shutdown(ctx); err != nil {
+					logger.Error("无法正常关闭HTTP服务器")
+				}
+				// 在这里做任何需要的清理工作
+				err := http.Restart()
+				if err != nil {
+					logger.Error("无法重启服务器")
+				}
+			case <-done:
+				// 添加停止服务
+				restartTicker.Stop()
+				logger.Info("HTTP服务正在关闭")
+				ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+				defer cancel()
+				if err := httpsrv.Shutdown(ctx); err != nil {
+					logger.Error("无法正常关闭HTTP服务")
+				}
+				logger.Info("HTTP服务已停止")
+				os.Exit(0) // 将终止程序
+
+			}
+		}
+	}()
 
 	internal.Start()
 }

@@ -9,6 +9,8 @@ import (
 	"time"
 )
 
+var data []Wlist
+
 type Store struct {
 	config *config.Config
 	db     *gorm.DB
@@ -51,7 +53,8 @@ func (s *Store) init() {
 	s.db.AutoMigrate(&Wlist{})
 }
 
-func Mysqlmain(config *config.Config) *Store {
+// NewStore 创建一个新的 store。
+func NewStore(config *config.Config) *Store {
 	s := &Store{config: config}
 	s.init()
 	return s
@@ -59,11 +62,6 @@ func Mysqlmain(config *config.Config) *Store {
 
 // 查全部
 func (s *Store) Mysqllistand(total int64, pageSize, offsetVal int, datal *Wlist) []Wlist {
-	var data []Wlist
-	s.config = config.GetConfig()
-	s.init()
-	sqlDB, _ := s.db.DB()
-	defer sqlDB.Close()
 	s.db.Model(datal).Count(&total).Limit(pageSize).Offset(offsetVal).Find(&data)
 	if len(data) == 0 {
 		return nil
@@ -74,11 +72,6 @@ func (s *Store) Mysqllistand(total int64, pageSize, offsetVal int, datal *Wlist)
 
 // 查一个
 func (s *Store) Mysqllist(id string) bool {
-	var data []Wlist
-	s.config = config.GetConfig()
-	s.init()
-	sqlDB, _ := s.db.DB()
-	defer sqlDB.Close()
 	s.db.Where("id = ?", id).First(&data)
 	if len(data) == 0 {
 		return false
@@ -88,20 +81,11 @@ func (s *Store) Mysqllist(id string) bool {
 
 // 增加
 func (s *Store) Mysqladd(data *Wlist) {
-	s.config = config.GetConfig()
-	s.init()
-	sqlDB, _ := s.db.DB()
-	defer sqlDB.Close()
 	s.db.Create(&data)
 }
 
 // 删
 func (s *Store) Mysqldelete(id string) bool {
-	var data []Wlist
-	s.config = config.GetConfig()
-	s.init()
-	sqlDB, _ := s.db.DB()
-	defer sqlDB.Close()
 	s.db.Where("id = ?", id).First(&data)
 	if len(data) == 0 {
 		return false
@@ -110,10 +94,7 @@ func (s *Store) Mysqldelete(id string) bool {
 	return true
 }
 
+// 改
 func (s *Store) Mysqlupdate(id string, data *Wlist) {
-	s.config = config.GetConfig()
-	s.init()
-	sqlDB, _ := s.db.DB()
-	defer sqlDB.Close()
 	s.db.Where("id = ?", id).Updates(&data)
 }

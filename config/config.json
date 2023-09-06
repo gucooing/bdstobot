@@ -1,6 +1,6 @@
 {
   "LogLevel": "Info",
-  "Port": "8080",
+  "addr": "127.0.0.1:8080",
   "McHost": "127.0.0.1:19132",
   "Mcpath": "D:\\bedrock_server.exe",
   "Pflp": {

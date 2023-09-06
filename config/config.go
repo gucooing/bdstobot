@@ -8,7 +8,7 @@ import (
 
 type Config struct {
 	LogLevel string `json:"logLevel"`
-	Port     string `json:"port"`
+	Addr     string `json:"addr"`
 	McHost   string `json:"McHost"`
 	Mcpath   string `json:"Mcpath"`
 	Pflp     *pflp
@@ -78,7 +78,7 @@ func LoadConfig() error {
 
 var DefaultConfig = &Config{
 	LogLevel: "Info",
-	Port:     "8080",
+	Addr:     "127.0.0.1:8080",
 	McHost:   "127.0.0.1:19132",
 	Mcpath:   "D:\\bedrock_server.exe",
 	Pflp: &pflp{

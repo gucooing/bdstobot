@@ -6,7 +6,6 @@ import (
 	"github.com/gucooing/bdstobot/internal/bds"
 	"github.com/gucooing/bdstobot/internal/discord"
 	"github.com/gucooing/bdstobot/internal/discordbot"
-	"github.com/gucooing/bdstobot/internal/http"
 	"github.com/gucooing/bdstobot/internal/qq"
 	"github.com/gucooing/bdstobot/pkg/logger"
 	"github.com/gucooing/bdstobot/pkg/state"
@@ -17,11 +16,6 @@ var errorCount int
 var nerrorCount int
 
 func Start() {
-	go func() {
-		http.Httpserver()
-		logger.Warn("http服务意外退出，将在5秒后重启")
-		time.Sleep(5 * time.Second)
-	}()
 	//qq部分
 	if config.GetConfig().QQ.QQ { //是否启用QQ
 		logger.Info("开启使用cqhttp连接QQ")
